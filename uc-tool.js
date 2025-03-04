@@ -1,7 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const app = express();
-const port = 3001; // Use a different port than X-UI (e.g., 3001)
+const port = 5000; // Use a different port than X-UI (e.g., 5000)
 
 // Endpoint to fetch user data
 app.get('/:uuid', async (req, res) => {
