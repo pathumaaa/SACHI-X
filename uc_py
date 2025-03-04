@@ -1,0 +1,31 @@
+from flask import Flask, jsonify, render_template
+import json
+
+app = Flask(__name__)
+
+# Sample function to fetch the usage data (you'll need to replace it with actual logic)
+def get_usage_data():
+    # Replace this with your actual data fetching logic
+    usage_data = {
+        'uuid': 'your-uuid-here',
+        'domain': 'your-domain-here',
+        'port': 12345,
+        'data_used': '1.5GB',
+        'expiration_date': '2025-03-31'
+    }
+    return usage_data
+
+# Route to show usage data directly as JSON
+@app.route('/usage')
+def show_usage():
+    data = get_usage_data()
+    return jsonify(data)
+
+# Route to show usage in a simple HTML page
+@app.route('/usage_html')
+def show_usage_html():
+    data = get_usage_data()
+    return render_template('usage.html', data=data)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
