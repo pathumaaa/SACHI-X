@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Traffic Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Check Your Traffic</h1>
+        <input type="text" id="uuid" placeholder="Enter your UUID">
+        <button onclick="fetchTraffic()">Check Traffic</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function fetchTraffic() {
+            const uuid = document.getElementById('uuid').value;
+            if (!uuid) {
+                alert("UUID is required!");
+                return;
+            }
+
+            fetch(`/user/traffic?uuid=${uuid}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('result').innerText = data.error;
+                    } else {
+                        document.getElementById('result').innerHTML = `
+                            <strong>UUID:</strong> ${data.uuid}<br>
+                            <strong>Downlink:</strong> ${data.downlink} bytes<br>
+                            <strong>Uplink:</strong> ${data.uplink} bytes
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching traffic:", error);
+                    document.getElementById('result').innerText = "Failed to fetch traffic data.";
+                });
+        }
+    </script>
+</body>
+</html>
