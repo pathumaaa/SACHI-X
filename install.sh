@@ -15,22 +15,16 @@ source usage-env/bin/activate
 # Install required Python packages
 pip install -r requirements.txt
 
-# Check if config.py exists, if not, create it
-if [ ! -f config.py ]; then
-    # Prompt for panel IP and port if config file does not exist
-    echo "Enter the Panel IP:"
-    read panel_ip
-    echo "Enter the Panel Port:"
-    read panel_port
+# Automatically fetch public IP address
+PANEL_IP=$(curl -s ifconfig.me)
 
-    # Save the panel IP and port to a config file
-    echo "PANEL_IP='$panel_ip'" > config.py
-    echo "PANEL_PORT='$panel_port'" >> config.py
-else
-    # If config file exists, just read the values
-    source config.py
-    echo "Using existing config: PANEL_IP='$PANEL_IP' and PANEL_PORT='$PANEL_PORT'"
-fi
+# Prompt for the panel port (default 8000 if not provided)
+read -p "Enter the Panel Port (default is 8000): " panel_port
+panel_port=${panel_port:-8000}  # Use default port if none provided
+
+# Save the panel IP and port to a config file
+echo "PANEL_IP='$PANEL_IP'" > config.py
+echo "PANEL_PORT='$panel_port'" >> config.py
 
 # Set up the Flask app
 echo "Setting up Flask app..."
