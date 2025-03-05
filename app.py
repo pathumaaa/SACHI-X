@@ -4,7 +4,7 @@ import requests
 app = Flask(__name__)
 
 # Replace with the correct URL of your X-UI panel's API
-X_UI_API_URL = "http://your-x-ui-panel-url/panel/api/inbounds/getClientTrafficsById"
+X_UI_API_URL = "https://<your_vps_ip_or_domain>/panel/api/inbounds/getClientTrafficsById"
 
 @app.route('/usage/<uuid>')
 def get_usage(uuid):
