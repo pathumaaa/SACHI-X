@@ -32,6 +32,6 @@ def fetch_user_data(username):
     return json.dumps(user_info)
 
 # Example usage: Fetch data by username
-username = 'example_username'
+username = 'balla'
 data = fetch_user_data(username)
 print(data)
