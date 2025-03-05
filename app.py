@@ -3,8 +3,8 @@ import requests
 
 app = Flask(__name__)
 
-PANEL_IP = "your_panel_ip"  # Will be configured during installation
-PANEL_PORT = "your_panel_port"  # Will be configured during installation
+PANEL_IP = "158.178.241.130"  # Will be configured during installation
+PANEL_PORT = "8000"  # Will be configured during installation
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
