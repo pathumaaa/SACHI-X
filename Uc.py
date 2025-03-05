@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 import grpc
 from xray_api.app.stats import command_pb2, command_pb2_grpc
 
@@ -21,6 +21,10 @@ class XrayAPI:
 
 # Initialize Xray API
 xray_api = XrayAPI(api_port=8080)  # Replace with your Xray API port
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 @app.route('/user/traffic', methods=['GET'])
 def get_user_traffic():
