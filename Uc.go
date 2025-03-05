@@ -53,7 +53,7 @@ func main() {
 	// Set up HTTP routes
 	http.HandleFunc("/user/traffic", getUserTraffic)
 
-	// Start the web server
-	fmt.Println("Server started at :8081")
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	// Start the web server on port 5000
+	fmt.Println("Server started at :5000")
+	log.Fatal(http.ListenAndServe(":5000", nil))
 }
