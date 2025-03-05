@@ -11,7 +11,7 @@ X_UI_API_URL = get_x_ui_url()
 def get_usage(uuid):
     try:
         # Fetch user data from X-UI API
-        response = requests.get(f"{X_UI_API_URL}/panel/api/inbounds/getClientTrafficsById/{uuid}", verify=False)
+       response = requests.get(f"{X_UI_API_URL}/panel/api/inbounds/getClientTrafficsById/{uuid}", verify=False)
         
         if response.status_code == 200:
             data = response.json()
