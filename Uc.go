@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"x-ui-client-view/xray" // Adjust the import path to match your project structure
+	"github.com/MasterHide/cud/xray" // Update this import path
 )
 
 var xrayAPI *xray.XrayAPI
