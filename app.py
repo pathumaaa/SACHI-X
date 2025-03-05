@@ -1,16 +1,17 @@
 from flask import Flask, render_template
 import requests
+from config import get_x_ui_url
 
 app = Flask(__name__)
 
-# Replace with the correct URL of your X-UI panel's API
-X_UI_API_URL = "https://<your_vps_ip_or_domain>/panel/api/inbounds/getClientTrafficsById"
+# Fetch the X-UI URL from the config
+X_UI_API_URL = get_x_ui_url()
 
 @app.route('/usage/<uuid>')
 def get_usage(uuid):
     try:
         # Fetch user data from X-UI API
-        response = requests.get(f"{X_UI_API_URL}/{uuid}")
+        response = requests.get(f"{X_UI_API_URL}/panel/api/inbounds/getClientTrafficsById/{uuid}", verify=False)
         
         if response.status_code == 200:
             data = response.json()
