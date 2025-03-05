@@ -3,8 +3,13 @@ import requests
 
 app = Flask(__name__)
 
-PANEL_IP = "158.178.241.130"  # Will be configured during installation
-PANEL_PORT = "8000"  # Will be configured during installation
+# Load panel IP and port from config.py
+try:
+    # Import the config file where PANEL_IP and PANEL_PORT are stored
+    from config import PANEL_IP, PANEL_PORT
+except ImportError:
+    PANEL_IP = "127.0.0.1"  # Default IP if the config is not found
+    PANEL_PORT = "8000"  # Default port if the config is not found
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
