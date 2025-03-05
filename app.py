@@ -1,15 +1,11 @@
 from flask import Flask, render_template, request
 import requests
+import config  # Import config to access PANEL_IP and PANEL_PORT
 
 app = Flask(__name__)
 
-# Load panel IP and port from config.py
-try:
-    # Import the config file where PANEL_IP and PANEL_PORT are stored
-    from config import PANEL_IP, PANEL_PORT
-except ImportError:
-    PANEL_IP = "127.0.0.1"  # Default IP if the config is not found
-    PANEL_PORT = "8000"  # Default port if the config is not found
+PANEL_IP = config.PANEL_IP  # Automatically fetched from config.py
+PANEL_PORT = config.PANEL_PORT  # Automatically fetched from config.py
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
