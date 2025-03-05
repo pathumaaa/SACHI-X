@@ -1,5 +1,3 @@
-# app.py
-
 from flask import Flask, render_template
 import requests
 from config import get_x_ui_url
