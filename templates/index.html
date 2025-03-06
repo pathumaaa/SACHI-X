@@ -3,31 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usage Checker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Check Usage</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        input { padding: 10px; width: 300px; }
+        button { padding: 10px; background-color: blue; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: darkblue; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Check Your Usage</h1>
-        <form method="POST" action="/">
-            <label for="email">Enter your Email or ID:</label>
-            <input type="text" name="email" id="email" required>
-            <button type="submit">Check Usage</button>
-        </form>
-        
-        {% if response %}
-        <div class="result">
-            {% if response.error %}
-                <p>Error: {{ response.error }}</p>
-            {% else %}
-                <h2>Usage Information</h2>
-                <p><strong>Email/ID:</strong> {{ response.email }}</p>
-                <p><strong>Traffic Used:</strong> {{ response.traffic_used }} MB</p>
-                <p><strong>Traffic Remaining:</strong> {{ response.traffic_remaining }} MB</p>
-                <p><strong>Expiration Date:</strong> {{ response.expiration_date }}</p>
-            {% endif %}
-        </div>
-        {% endif %}
-    </div>
+    <h2>Check Your Usage</h2>
+    <form action="/usage" method="POST">
+        <input type="text" name="user_input" placeholder="Enter Email or ID" required>
+        <button type="submit">Check Usage</button>
+    </form>
 </body>
 </html>
