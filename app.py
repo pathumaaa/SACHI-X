@@ -1,31 +1,39 @@
-from flask import Flask, render_template, request
-import requests
-import config  # Import config to access PANEL_IP and PANEL_PORT
+from flask import Flask, request, render_template
+import sqlite3
+from datetime import datetime
 
 app = Flask(__name__)
 
-PANEL_IP = config.PANEL_IP  # Automatically fetched from config.py
-PANEL_PORT = config.PANEL_PORT  # Automatically fetched from config.py
+db_path = "/etc/x-sl/x-ui.db"  # Change this if your database is located elsewhere
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        email = request.form['email']
-        response = get_client_data(email)
-        return render_template('index.html', response=response)
-    return render_template('index.html', response=None)
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-def get_client_data(email):
-    url = f'http://{PANEL_IP}:{PANEL_PORT}/panel/api/inbounds/getClientTraffics/{email}'
-    headers = {
-        'Accept': 'application/json',
-        # You may need to add authorization headers if required
-    }
-    try:
-        response = requests.get(url, headers=headers)
-        return response.json() if response.status_code == 200 else {"error": "Failed to fetch data"}
-    except requests.exceptions.RequestException as e:
-        return {"error": f"An error occurred: {e}"}
+@app.route('/usage', methods=['POST'])
+def usage():
+    user_input = request.form.get('user_input')  # Get input from the form
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # Check if the input is an email or ID
+    query = '''SELECT email, up, down, total, expiry_time FROM client_traffics WHERE email = ? OR id = ?'''
+    cursor.execute(query, (user_input, user_input))
+
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        email = row[0]
+        up = row[1]
+        down = row[2]
+        total = row[3]
+        expiry_date = datetime.utcfromtimestamp(row[4]).strftime('%Y-%m-%d %H:%M:%S')
+
+        return render_template('result.html', email=email, up=up, down=down, total=total, expiry_date=expiry_date)
+    else:
+        return "No data found for this user."
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
