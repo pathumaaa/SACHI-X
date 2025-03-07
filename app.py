@@ -18,7 +18,7 @@ def usage():
     cursor = conn.cursor()
 
     # Check if the input is an email or ID
-    query = '''SELECT email, up, down, total, expiry_time FROM client_traffics WHERE email = ? OR id = ?'''
+    query = '''SELECT email, up, down, total, quota, expiry_time FROM client_traffics WHERE email = ? OR id = ?'''
     cursor.execute(query, (user_input, user_input))
 
     row = cursor.fetchone()
@@ -26,18 +26,23 @@ def usage():
 
     if row:
         email = row[0]
-        up = row[1]
-        down = row[2]
-        total = row[3]
-        
-        # Fix for handling expiry_time (assuming it's in milliseconds)
-        try:
-            expiry_time_seconds = row[4] / 1000  # Convert from milliseconds to seconds
-            expiry_date = datetime.utcfromtimestamp(expiry_time_seconds).strftime('%Y-%m-%d %H:%M:%S')
-        except (ValueError, TypeError):
-            expiry_date = "Invalid date"
-        
-        return render_template('result.html', email=email, up=up, down=down, total=total, expiry_date=expiry_date)
+        up = row[1] / 1048576  # Convert bytes to MB
+        down = row[2] / 1048576  # Convert bytes to MB
+        total = row[3] / 1048576  # Convert bytes to MB
+        quota = row[4] / 1048576  # Convert quota to MB (assuming it's stored in bytes)
+        expiry_date = datetime.utcfromtimestamp(row[5]).strftime('%Y-%m-%d %H:%M:%S')
+
+        # Calculate remaining data
+        remaining_data = quota - total
+
+        # Calculate remaining time (in days)
+        expiry_timestamp = row[5]
+        current_time = datetime.utcnow().timestamp()
+        remaining_time_seconds = expiry_timestamp - current_time
+        remaining_time_days = remaining_time_seconds / (60 * 60 * 24)  # Convert seconds to days
+
+        return render_template('result.html', email=email, up=up, down=down, total=total, quota=quota, 
+                               remaining_data=remaining_data, expiry_date=expiry_date, remaining_time_days=remaining_time_days)
     else:
         return "No data found for this user."
 
