@@ -29,8 +29,14 @@ def usage():
         up = row[1]
         down = row[2]
         total = row[3]
-        expiry_date = datetime.utcfromtimestamp(row[4]).strftime('%Y-%m-%d %H:%M:%S')
-
+        
+        # Fix for handling expiry_time (assuming it's in milliseconds)
+        try:
+            expiry_time_seconds = row[4] / 1000  # Convert from milliseconds to seconds
+            expiry_date = datetime.utcfromtimestamp(expiry_time_seconds).strftime('%Y-%m-%d %H:%M:%S')
+        except (ValueError, TypeError):
+            expiry_date = "Invalid date"
+        
         return render_template('result.html', email=email, up=up, down=down, total=total, expiry_date=expiry_date)
     else:
         return "No data found for this user."
