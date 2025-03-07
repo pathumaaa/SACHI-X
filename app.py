@@ -7,6 +7,19 @@ app = Flask(__name__)
 
 db_path = "/etc/x-ui/x-ui.db"  # Change this if your database is located elsewhere
 
+def convert_bytes(byte_size):
+    """Convert bytes to a human-readable format (MB, GB, TB)."""
+    if byte_size < 1024:
+        return f"{byte_size} Bytes"
+    elif byte_size < 1024 * 1024:
+        return f"{round(byte_size / 1024, 2)} KB"
+    elif byte_size < 1024 * 1024 * 1024:
+        return f"{round(byte_size / (1024 * 1024), 2)} MB"
+    elif byte_size < 1024 * 1024 * 1024 * 1024:
+        return f"{round(byte_size / (1024 * 1024 * 1024), 2)} GB"
+    else:
+        return f"{round(byte_size / (1024 * 1024 * 1024 * 1024), 2)} TB"
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -40,7 +53,7 @@ def usage():
             expiry_date = "Invalid Date"
 
         # Query to fetch totalGB and user status from inbounds table based on inbound_id
-        inbound_query = '''SELECT settings FROM inbounds WHERE id = ?'''
+        inbound_query = '''SELECT settings, enable FROM inbounds WHERE id = ?'''
         cursor.execute(inbound_query, (inbound_id,))
         inbound_row = cursor.fetchone()
 
@@ -60,6 +73,12 @@ def usage():
                 totalGB = "Invalid JSON Data"
 
         conn.close()
+
+        # Convert data to human-readable format
+        up = convert_bytes(up)
+        down = convert_bytes(down)
+        total = convert_bytes(total)
+        totalGB = convert_bytes(totalGB) if totalGB != "Not Available" else totalGB
 
         # Return results to the result page
         return render_template(
