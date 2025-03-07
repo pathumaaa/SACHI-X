@@ -4,7 +4,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-db_path = "/etc/x-sl/x-ui.db"  # Change this if your database is located elsewhere
+db_path = "/etc/x-ui/x-ui.db"  # Change this if your database is located elsewhere
 
 @app.route('/')
 def home():
