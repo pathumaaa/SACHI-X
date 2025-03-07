@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-SL USAGE</title> <!-- Changed title -->
+    <title>X-SL USAGE</title> 
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #6a1b9a, #1e3c72); /* Purple to Blue gradient */
+            background: linear-gradient(135deg, #4a148c, #0d47a1);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,39 +17,79 @@
             flex-direction: column;
         }
         .container {
-            background: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 500px;
+            max-width: 400px;
             text-align: left;
         }
         h2 {
-            color: #fff;
-            margin-bottom: 20px;
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 22px;
+            font-weight: bold;
             text-align: center;
-            font-size: 26px;
         }
         .info {
-            background: rgba(255, 255, 255, 0.4);
-            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.15);
+            margin: 8px 0;
             padding: 10px;
             border-radius: 6px;
             font-size: 14px;
-            color: #fff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            color: #ffffff;
+            font-weight: bold;
         }
-        .info strong {
-            color: #fff;
-            font-weight: normal;
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .progress-bar {
+            height: 6px;
+            width: 0%;
+            background: #05B031;
+            transition: width 1.5s ease-in-out;
+        }
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .toggle {
+            width: 32px;
+            height: 18px;
+            background: #bbb;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .toggle:before {
+            content: "";
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 2px;
+            transform: translateY(-50%);
+            transition: 0.3s;
+        }
+        .toggle.active {
+            background: #2ecc71;
+        }
+        .toggle.active:before {
+            left: 16px;
         }
         .footer {
             font-size: 12px;
-            color: #868e96;
-            margin-top: 20px;
+            color: #ffffff;
+            margin-top: 15px;
             text-align: center;
         }
     </style>
@@ -58,18 +98,62 @@
 
 <div class="container">
     <h2>User Data Usage</h2>
-    <div class="info"><strong>Email:</strong> {{ email }}</div>
-    <div class="info"><strong>Uploaded:</strong> {{ up }}</div>
-    <div class="info"><strong>Downloaded:</strong> {{ down }}</div>
-    <div class="info"><strong>Limit:</strong> {{ total }}</div>
-    <div class="info"><strong>Expiry Date:</strong> {{ expiry_date }}</div>
-    <div class="info"><strong>Total GB:</strong> {{ totalGB }}</div>
-    <div class="info"><strong>Config Status:</strong> {{ user_status }}</div>
+    <div class="info">Name: {{ email }}</div>
+    <div class="info">Uploaded: {{ up }} GB
+        <div class="progress-container">
+            <div class="progress-bar" id="uploaded-bar"></div>
+        </div>
+    </div>
+    <div class="info">Downloaded: {{ down }} GB
+        <div class="progress-container">
+            <div class="progress-bar" id="downloaded-bar"></div>
+        </div>
+    </div>
+    <div class="info">Limit: {{ total }} GB
+        <div class="progress-container">
+            <div class="progress-bar" id="limit-bar"></div>
+        </div>
+    </div>
+    <div class="info">Total GB: {{ totalGB }} GB
+        <div class="progress-container">
+            <div class="progress-bar" id="totalGB-bar"></div>
+        </div>
+    </div>
+    <div class="info">Expiry Date: {{ expiry_date }}</div>
+    <div class="info toggle-container">
+        <span>Config Status:</span>
+        <div class="toggle" id="config-toggle"></div>
+    </div>
 </div>
 
 <div class="footer">
-    <p>&copy; 2025 Traffic-X. All rights reserved.</p>
+    &copy; 2025 Traffic-X. All rights reserved.
 </div>
+
+<script>
+    function animateProgressBar(id, value, max) {
+        let percentage = (value / max) * 100;
+        document.getElementById(id).style.width = percentage + "%";
+    }
+
+    let uploaded = 5;
+    let downloaded = 12;
+    let totalLimit = 50;
+    let totalGB = 40;
+    let configStatus = true;
+
+    setTimeout(() => {
+        animateProgressBar("uploaded-bar", uploaded, totalLimit);
+        animateProgressBar("downloaded-bar", downloaded, totalLimit);
+        animateProgressBar("limit-bar", totalLimit, totalLimit);
+        animateProgressBar("totalGB-bar", totalGB, totalLimit);
+    }, 500);
+
+    let toggle = document.getElementById("config-toggle");
+    if (configStatus) {
+        toggle.classList.add("active");
+    }
+</script>
 
 </body>
 </html>
