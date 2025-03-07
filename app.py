@@ -17,33 +17,32 @@ def usage():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    # Check if the input is an email or ID
-    query = '''SELECT email, up, down, total, quota, expiry_time FROM client_traffics WHERE email = ? OR id = ?'''
+    # Query to fetch client data from client_traffics
+    query = '''SELECT email, up, down, total, expiry_time, inbound_id FROM client_traffics WHERE email = ? OR id = ?'''
     cursor.execute(query, (user_input, user_input))
 
     row = cursor.fetchone()
-    conn.close()
 
     if row:
         email = row[0]
-        up = row[1] / 1048576  # Convert bytes to MB
-        down = row[2] / 1048576  # Convert bytes to MB
-        total = row[3] / 1048576  # Convert bytes to MB
-        quota = row[4] / 1048576  # Convert quota to MB (assuming it's stored in bytes)
-        expiry_date = datetime.utcfromtimestamp(row[5]).strftime('%Y-%m-%d %H:%M:%S')
+        up = row[1]
+        down = row[2]
+        total = row[3]
+        expiry_date = datetime.utcfromtimestamp(row[4]).strftime('%Y-%m-%d %H:%M:%S')
+        inbound_id = row[5]  # Get the inbound_id to query the inbounds table for totalGB
 
-        # Calculate remaining data
-        remaining_data = quota - total
+        # Query to fetch totalGB from inbounds table based on inbound_id
+        inbound_query = '''SELECT totalGB FROM inbounds WHERE id = ?'''
+        cursor.execute(inbound_query, (inbound_id,))
+        inbound_row = cursor.fetchone()
 
-        # Calculate remaining time (in days)
-        expiry_timestamp = row[5]
-        current_time = datetime.utcnow().timestamp()
-        remaining_time_seconds = expiry_timestamp - current_time
-        remaining_time_days = remaining_time_seconds / (60 * 60 * 24)  # Convert seconds to days
+        totalGB = inbound_row[0] if inbound_row else "Not Available"
 
-        return render_template('result.html', email=email, up=up, down=down, total=total, quota=quota, 
-                               remaining_data=remaining_data, expiry_date=expiry_date, remaining_time_days=remaining_time_days)
+        conn.close()
+
+        return render_template('result.html', email=email, up=up, down=down, total=total, expiry_date=expiry_date, totalGB=totalGB)
     else:
+        conn.close()
         return "No data found for this user."
 
 if __name__ == '__main__':
