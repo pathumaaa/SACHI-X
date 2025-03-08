@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Ask user for necessary information
-echo "Enter your Os username (e.g., ubuntu):"
+echo "Enter your OS username (e.g., ubuntu):"
 read USERNAME
-echo "Enter your server IP or domain (e.g., 158.170.000.000 or your_domain.com):"
+echo "Enter your server IP (e.g., 158.170.000.000):"
 read SERVER_IP
-echo "Enter the port type 5000 (default: 5000):"
+echo "Enter the port (default: 5000):"
 read PORT
 PORT=${PORT:-5000}
 
@@ -17,19 +17,19 @@ sudo apt update
 echo "Installing required dependencies..."
 sudo apt install -y python3-pip python3-venv git sqlite3
 
-# Install psutil for Python3
-echo "Installing psutil for Python3..."
-pip3 install psutil
+# Install Flask, psutil, and requests for Python3
+echo "Installing Flask, psutil, and requests for Python3..."
+pip3 install flask psutil requests
 
-# Install psutil for Python (if pip is installed)
+# Install Flask, psutil, and requests for Python (if pip is installed)
 if command -v pip &> /dev/null; then
-    echo "Installing psutil for Python..."
-    pip install psutil
+    echo "Installing Flask, psutil, and requests for Python..."
+    pip install flask psutil requests
 else
-    echo "pip not found. Skipping psutil installation for Python."
+    echo "pip not found. Skipping Flask, psutil, and requests installation for Python."
 fi
 
-echo "All dependencies installed successfully!"
+echo "All dependencies installed successfully! Babe"
 
 # Clone your GitHub repository
 echo "Cloning your repository from GitHub..."
