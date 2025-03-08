@@ -139,23 +139,62 @@
 </div>
 
 <script>
-    function animateProgressBar(id, value, max) {
-        let percentage = (value / max) * 100;
-        document.getElementById(id).style.width = percentage + "%";
+    function parseValue(value) {
+        return parseFloat(value.replace(/[^\d.]/g, '')) || 0;
     }
 
-    // Get dynamic values from Flask backend
-    let uploaded = parseFloat("{{ up }}".replace(/[^\d.]/g, '')) || 0;
-    let downloaded = parseFloat("{{ down }}".replace(/[^\d.]/g, '')) || 0;
-    let totalLimit = parseFloat("{{ total }}".replace(/[^\d.]/g, '')) || 0;
-    let totalGB = parseFloat("{{ totalGB }}".replace(/[^\d.]/g, '')) || 0;
+    // Convert values to MB for accurate calculations
+    function convertToMB(value, unit) {
+        if (unit.includes("GB")) {
+            return value * 1024; // Convert GB to MB
+        } else if (unit.includes("KB")) {
+            return value / 1024; // Convert KB to MB
+        } else {
+            return value; // Assume MB
+        }
+    }
 
+    // Extract units from the Flask variables
+    let uploadedUnit = "{{ up }}".replace(/[^a-zA-Z]/g, ''); // Extract "MB", "GB", etc.
+    let downloadedUnit = "{{ down }}".replace(/[^a-zA-Z]/g, '');
+    let totalLimitUnit = "{{ total }}".replace(/[^a-zA-Z]/g, '');
+
+    // Get dynamic values from Flask backend
+    let uploaded = parseValue("{{ up }}");
+    let downloaded = parseValue("{{ down }}");
+    let totalLimit = parseValue("{{ total }}");
+    let totalGB = parseValue("{{ totalGB }}");
+
+    // Convert all values to MB
+    uploaded = convertToMB(uploaded, uploadedUnit);
+    downloaded = convertToMB(downloaded, downloadedUnit);
+    totalLimit = convertToMB(totalLimit, totalLimitUnit);
+
+    // Calculate total usage (uploaded + downloaded)
+    let totalUsage = uploaded + downloaded;
+
+    // Animate progress bars based on usage
     setTimeout(() => {
-        animateProgressBar("uploaded-bar", uploaded, totalLimit);
-        animateProgressBar("downloaded-bar", downloaded, totalLimit);
-        animateProgressBar("limit-bar", totalLimit, totalLimit);
-        animateProgressBar("totalGB-bar", totalGB, totalLimit);
+        if (totalLimit > 0) {
+            // Uploaded progress bar
+            animateProgressBar("uploaded-bar", uploaded, totalLimit);
+
+            // Downloaded progress bar
+            animateProgressBar("downloaded-bar", downloaded, totalLimit);
+
+            // Total usage progress bar
+            animateProgressBar("limit-bar", totalUsage, totalLimit);
+
+            // Total GB progress bar (optional, if needed)
+            animateProgressBar("totalGB-bar", totalGB, totalLimit);
+        }
     }, 500);
+
+    // Function to animate progress bars
+    function animateProgressBar(id, value, max) {
+        let percentage = (value / max) * 100; // Calculate percentage
+        document.getElementById(id).style.width = percentage + "%"; // Set width
+    }
 
     // Get user status dynamically from backend
     let configStatus = "{{ user_status }}".trim().toLowerCase() === "enabled";
