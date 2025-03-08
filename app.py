@@ -122,5 +122,10 @@ def server_location():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/ping')
+def ping():
+    """Endpoint for ping test."""
+    return jsonify({"status": "success", "message": "Pong!"})
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
