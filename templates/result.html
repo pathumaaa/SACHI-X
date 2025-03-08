@@ -208,11 +208,35 @@
         if (!toggle) {
             console.error("Element with ID config-toggle not found.");
         } else {
+            // Set initial toggle state
             if (configStatus) {
                 toggle.classList.add("active");
             } else {
                 toggle.classList.remove("active");
             }
+
+            // Add click event listener to toggle
+            toggle.addEventListener("click", function () {
+                this.classList.toggle("active");
+                let newStatus = this.classList.contains("active");
+                console.log("New status:", newStatus);
+
+                // Send new status to the server (optional)
+                fetch("/update-status", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ status: newStatus }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Status updated:", data);
+                })
+                .catch(error => {
+                    console.error("Error updating status:", error);
+                });
+            });
         }
 
         // Debugging: Log values to the console
