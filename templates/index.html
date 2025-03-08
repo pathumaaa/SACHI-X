@@ -368,12 +368,35 @@
 
         // Form Submission Handling
         const userForm = document.getElementById("user-form");
-        userForm.addEventListener("submit", (event) => {
+        userForm.addEventListener("submit", async (event) => {
             event.preventDefault();
-            const userName = userForm.user_input.value;
-            alert(`Checking usage for: ${userName}`);
-            // Add your form submission logic here
+            const formData = new FormData(userForm);
+            const response = await fetch("/usage", {
+                method: "POST",
+                body: formData
+            });
+            const result = await response.text();
+            document.body.innerHTML = result; // Redirect to the result page
         });
+
+        // Real-Time Server Resource Updates
+        setInterval(async () => {
+            const response = await fetch("/server-status");
+            const data = await response.json();
+            document.getElementById("cpu-usage").textContent = `${data.cpu}%`;
+            document.getElementById("cpu-progress").style.width = `${data.cpu}%`;
+            document.getElementById("memory-usage").textContent = `${data.ram}%`;
+            document.getElementById("memory-progress").style.width = `${data.ram}%`;
+            document.getElementById("disk-usage").textContent = `${data.disk}%`;
+            document.getElementById("disk-progress").style.width = `${data.disk}%`;
+        }, 1000);
+
+        // Fetch Server Location
+        (async () => {
+            const response = await fetch("/server-location");
+            const data = await response.json();
+            document.getElementById("server-location").textContent = `${data.city}, ${data.country}`;
+        })();
     </script>
 
 </body>
