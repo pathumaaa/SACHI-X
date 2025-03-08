@@ -135,11 +135,13 @@
 
 <script>
     function parseValue(value) {
+        if (!value) return 0; // Handle empty or undefined values
         return parseFloat(value.replace(/[^\d.]/g, '')) || 0;
     }
 
     // Convert values to MB for accurate calculations
     function convertToMB(value, unit) {
+        if (!unit) return value; // Assume MB if no unit is provided
         if (unit.includes("GB")) {
             return value * 1024; // Convert GB to MB
         } else if (unit.includes("KB")) {
