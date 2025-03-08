@@ -144,11 +144,11 @@
         document.getElementById(id).style.width = percentage + "%";
     }
 
-    let uploaded = 5;
-    let downloaded = 12;
-    let totalLimit = 50;
-    let totalGB = 40;
-    let configStatus = true;
+    // Get dynamic values from Flask backend
+    let uploaded = parseFloat("{{ up }}".replace(/[^\d.]/g, '')) || 0;
+    let downloaded = parseFloat("{{ down }}".replace(/[^\d.]/g, '')) || 0;
+    let totalLimit = parseFloat("{{ total }}".replace(/[^\d.]/g, '')) || 0;
+    let totalGB = parseFloat("{{ totalGB }}".replace(/[^\d.]/g, '')) || 0;
 
     setTimeout(() => {
         animateProgressBar("uploaded-bar", uploaded, totalLimit);
@@ -157,9 +157,14 @@
         animateProgressBar("totalGB-bar", totalGB, totalLimit);
     }, 500);
 
+    // Get user status dynamically from backend
+    let configStatus = "{{ user_status }}".trim().toLowerCase() === "enabled";
+
     let toggle = document.getElementById("config-toggle");
     if (configStatus) {
         toggle.classList.add("active");
+    } else {
+        toggle.classList.remove("active");
     }
 </script>
 
