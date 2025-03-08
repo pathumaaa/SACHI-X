@@ -120,6 +120,7 @@ def usage():
                 for client in inbound_data.get('clients', []):
                     if client.get('email') == email:
                         totalGB = client.get('totalGB', "Not Available")
+                        # ✅ RESTORED USER-SPECIFIC STATUS CHECK
                         user_status = "Enabled" if client.get('enable', True) else "Disabled"
                         break
             except json.JSONDecodeError:
