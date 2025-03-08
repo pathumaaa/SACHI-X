@@ -51,9 +51,11 @@ pip install flask
 # Configure the Flask app to run on the specified port
 echo "Configuring Flask app..."
 cat > app.py <<EOL
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 import sqlite3
 import json
+import psutil
+import requests
 from datetime import datetime
 
 app = Flask(__name__)
@@ -119,7 +121,7 @@ def usage():
                 for client in inbound_data.get('clients', []):
                     if client.get('email') == email:
                         totalGB = client.get('totalGB', "Not Available")
-                        user_status = "Enabled" if client.get('enable', True) else "Disabled"  # ✅ RESTORED USER-SPECIFIC STATUS CHECK
+                        user_status = "Enabled" if client.get('enable', True) else "Disabled"
                         break
             except json.JSONDecodeError:
                 totalGB = "Invalid JSON Data"
@@ -145,6 +147,38 @@ def usage():
     else:
         conn.close()
         return "No data found for this user."
+
+@app.route('/server-status')
+def server_status():
+    """Returns real-time CPU, RAM, and Disk usage."""
+    try:
+        status = {
+            "cpu": psutil.cpu_percent(interval=1),
+            "ram": psutil.virtual_memory().percent,
+            "disk": psutil.disk_usage('/').percent
+        }
+        return jsonify(status)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/server-location')
+def server_location():
+    """Fetches server location based on public IP."""
+    try:
+        response = requests.get("http://ip-api.com/json/")
+        data = response.json()
+        return jsonify({
+            "country": data.get("country", "Unknown"),
+            "city": data.get("city", "Unknown"),
+            "ip": data.get("query", "Unknown")
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/ping')
+def ping():
+    """Endpoint for ping test."""
+    return jsonify({"status": "success", "message": "Pong!"})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
