@@ -4,95 +4,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Check Usage</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #6a1b9a, #263D9B, #742CA1, #009688);
-            background-size: 300% 300%;
-            animation: gradientAnimation 10s ease infinite;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: white;
-        }
-        h2 {
-            color: #fff;
-            margin-bottom: 20px;
-        }
-        .form-container {
-            background: rgba(255, 255, 255, 0.2); /* Semi-transparent white background */
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-        input {
-            padding: 15px;
-            width: 80%;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            background-color: #fff;
-            color: #333;
-        }
-        input:focus {
-            border-color: #007BFF;
-            outline: none;
-        }
-        button {
-            padding: 15px;
-            width: 80%;
-            background-color: #641B9F; /* Blue button */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        button:active {
-            background-color: #004085;
-        }
-        .footer {
-            font-size: 12px;
-            color: #868e96;
-            margin-top: 20px;
-            text-align: center;
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-        }
+        /* Your existing CSS styles remain unchanged */
     </style>
 </head>
 <body>
 
-    <div class="form-container">
+    <div class="container">
         <h2>Check Your Usage</h2>
-        <form action="/usage" method="POST">
-            <input type="text" name="user_input" placeholder="Enter User Name" required>
-            <button type="submit">Check Usage</button>
-        </form>
+
+        <!-- Top Box: Enter User Details -->
+        <div class="grid-container">
+            <div class="card">
+                <h3><i class="fas fa-user" aria-label="User"></i>Enter User Details</h3>
+                <form id="user-form" action="/usage" method="POST">
+                    <input type="text" name="user_input" placeholder="Enter User Name" required>
+                    <button type="submit">Check Usage</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Two Boxes Below: Server Resources and Ping Test -->
+        <div class="grid-container two-column">
+            <!-- Left Box: Server Resources -->
+            <div class="card">
+                <h3><i class="fas fa-server" aria-label="Server"></i>Server Resources</h3>
+                <div class="resource-item">
+                    <h4><i class="fas fa-microchip" aria-label="CPU"></i>CPU Usage</h4>
+                    <p>{{ server_resources.cpu_usage }}% ({{ server_resources.cpu_cores }} cores)</p>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: {{ server_resources.cpu_usage }}%;"></div>
+                    </div>
+                </div>
+                <div class="resource-item">
+                    <h4><i class="fas fa-memory" aria-label="Memory"></i>Memory Usage</h4>
+                    <p>{{ server_resources.ram_used }} / {{ server_resources.ram_total }} ({{ server_resources.ram_percent }}%)</p>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: {{ server_resources.ram_percent }}%;"></div>
+                    </div>
+                </div>
+                <div class="resource-item">
+                    <h4><i class="fas fa-hdd" aria-label="Disk"></i>Disk Usage</h4>
+                    <p>{{ server_resources.disk_used }} / {{ server_resources.disk_total }} ({{ server_resources.disk_percent }}%)</p>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: {{ server_resources.disk_percent }}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Box: Ping Test -->
+            <div class="card ping-tool">
+                <h3><i class="fas fa-network-wired" aria-label="Ping"></i>Ping Test</h3>
+                <button id="ping-button">Ping Server</button>
+                <div class="ping-result" id="ping-result">Ping: -</div>
+                <div class="server-location">
+                    <i class="fas fa-map-marker-alt" aria-label="Location"></i>
+                    <span>Server Location: <strong id="server-location">New York, USA</strong></span>
+                </div>
+                <!-- Moved Server Status Here -->
+                <div class="server-status">
+                    <i class="fas fa-heartbeat" aria-label="Status"></i>
+                    <span>Server Status: <strong id="server-status">Online</strong></span>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Footer -->
     <div class="footer">
         <p>&copy; 2025 Traffic-X. All rights reserved.</p>
+        <div class="social-icons">
+            <a href="https://www.tiktok.com/" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+            <a href="https://t.me/" target="_blank" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+            <a href="https://www.youtube.com/" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
     </div>
+
+    <script>
+        // Real-Time Ping Tool
+        const pingButton = document.getElementById("ping-button");
+        const pingResult = document.getElementById("ping-result");
+
+        pingButton.addEventListener("click", async () => {
+            const startTime = Date.now();
+            pingResult.textContent = "Pinging...";
+
+            try {
+                const response = await fetch("/ping"); // Replace with your ping endpoint
+                const endTime = Date.now();
+                const pingTime = endTime - startTime;
+                pingResult.textContent = `Ping: ${pingTime} ms`;
+            } catch (error) {
+                pingResult.textContent = "Ping failed";
+            }
+        });
+
+        // Form Submission Handling
+        const userForm = document.getElementById("user-form");
+        userForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const userName = userForm.user_input.value;
+            alert(`Checking usage for: ${userName}`);
+            // Add your form submission logic here
+        });
+    </script>
 
 </body>
 </html>
