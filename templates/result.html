@@ -139,7 +139,6 @@
         return parseFloat(value.replace(/[^\d.]/g, '')) || 0;
     }
 
-    // Convert values to MB for accurate calculations
     function convertToMB(value, unit) {
         if (!unit) return value; // Assume MB if no unit is provided
         if (unit.includes("GB")) {
@@ -169,7 +168,6 @@
     // Calculate total usage (uploaded + downloaded)
     let totalUsage = uploaded + downloaded;
 
-    // Function to set progress bar color based on percentage
     function setProgressBarColor(progressBar, percentage) {
         if (percentage <= 50) {
             progressBar.style.backgroundColor = "#05B031"; // Green
@@ -182,7 +180,6 @@
         }
     }
 
-    // Function to animate progress bars
     function animateProgressBar(id, value, max) {
         let progressBar = document.getElementById(id);
         let percentage = (value / max) * 100; // Calculate percentage
@@ -193,13 +190,8 @@
     // Animate progress bars based on usage
     setTimeout(() => {
         if (totalLimit > 0) {
-            // Uploaded progress bar
             animateProgressBar("uploaded-bar", uploaded, totalLimit);
-
-            // Downloaded progress bar
             animateProgressBar("downloaded-bar", downloaded, totalLimit);
-
-            // Total usage progress bar
             animateProgressBar("limit-bar", totalUsage, totalLimit);
         }
     }, 500);
@@ -213,6 +205,12 @@
     } else {
         toggle.classList.remove("active");
     }
+
+    // Debugging: Log values to the console
+    console.log("Uploaded: {{ up }}", uploaded);
+    console.log("Downloaded: {{ down }}", downloaded);
+    console.log("Total Limit: {{ total }}", totalLimit);
+    console.log("User Status: {{ user_status }}", configStatus);
 </script>
 
 </body>
