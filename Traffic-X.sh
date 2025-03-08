@@ -111,7 +111,7 @@ def usage():
         inbound_row = cursor.fetchone()
 
         totalGB = "Not Available"
-        user_status = "User Not Found in Inbound"
+        user_status = False  # Default to disabled if user is not found
 
         if inbound_row:
             settings = inbound_row[0]
@@ -120,8 +120,7 @@ def usage():
                 for client in inbound_data.get('clients', []):
                     if client.get('email') == email:
                         totalGB = client.get('totalGB', "Not Available")
-                        # ✅ RESTORED USER-SPECIFIC STATUS CHECK
-                        user_status = "Enabled" if client.get('enable', True) else "Disabled"
+                        user_status = client.get('enable', False)  # Fetch specific user's status
                         break
             except json.JSONDecodeError:
                 totalGB = "Invalid JSON Data"
@@ -150,11 +149,19 @@ def usage():
             total=total,
             expiry_date=expiry_date,
             totalGB=totalGB,
-            user_status=user_status  # Pass correct user status
+            user_status=user_status  # Pass specific user's status
         )
     else:
         conn.close()
         return "No data found for this user."
+
+@app.route('/update-status', methods=['POST'])
+def update_status():
+    data = request.get_json()
+    new_status = data.get('status')  # True or False
+    # Update the status in the database (implement this logic)
+    print(f"Updating status to: {new_status}")
+    return jsonify({"status": "success", "message": "Status updated"})
 
 @app.route('/server-status')
 def server_status():
