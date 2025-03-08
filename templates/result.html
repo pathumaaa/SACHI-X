@@ -59,8 +59,8 @@
         .progress-bar {
             height: 6px;
             width: 0%;
-            background: #05B031;
-            transition: width 1.5s ease-in-out;
+            background: #05B031; /* Default green color */
+            transition: width 1.5s ease-in-out, background-color 0.5s ease;
         }
         .toggle-container {
             display: flex;
@@ -158,6 +158,7 @@
     let uploadedUnit = "{{ up }}".replace(/[^a-zA-Z]/g, ''); // Extract "MB", "GB", etc.
     let downloadedUnit = "{{ down }}".replace(/[^a-zA-Z]/g, '');
     let totalLimitUnit = "{{ total }}".replace(/[^a-zA-Z]/g, '');
+    let totalGBUnit = "{{ totalGB }}".replace(/[^a-zA-Z]/g, '');
 
     // Get dynamic values from Flask backend
     let uploaded = parseValue("{{ up }}");
@@ -169,9 +170,31 @@
     uploaded = convertToMB(uploaded, uploadedUnit);
     downloaded = convertToMB(downloaded, downloadedUnit);
     totalLimit = convertToMB(totalLimit, totalLimitUnit);
+    totalGB = convertToMB(totalGB, totalGBUnit);
 
     // Calculate total usage (uploaded + downloaded)
     let totalUsage = uploaded + downloaded;
+
+    // Function to set progress bar color based on percentage
+    function setProgressBarColor(progressBar, percentage) {
+        if (percentage <= 50) {
+            progressBar.style.backgroundColor = "#05B031"; // Green
+        } else if (percentage <= 80) {
+            progressBar.style.backgroundColor = "#FFD700"; // Yellow
+        } else if (percentage <= 98) {
+            progressBar.style.backgroundColor = "#FFA500"; // Orange
+        } else {
+            progressBar.style.backgroundColor = "#FF0000"; // Red
+        }
+    }
+
+    // Function to animate progress bars
+    function animateProgressBar(id, value, max) {
+        let progressBar = document.getElementById(id);
+        let percentage = (value / max) * 100; // Calculate percentage
+        progressBar.style.width = percentage + "%"; // Set width
+        setProgressBarColor(progressBar, percentage); // Set color
+    }
 
     // Animate progress bars based on usage
     setTimeout(() => {
@@ -185,16 +208,10 @@
             // Total usage progress bar
             animateProgressBar("limit-bar", totalUsage, totalLimit);
 
-            // Total GB progress bar (optional, if needed)
+            // Total GB progress bar
             animateProgressBar("totalGB-bar", totalGB, totalLimit);
         }
     }, 500);
-
-    // Function to animate progress bars
-    function animateProgressBar(id, value, max) {
-        let percentage = (value / max) * 100; // Calculate percentage
-        document.getElementById(id).style.width = percentage + "%"; // Set width
-    }
 
     // Get user status dynamically from backend
     let configStatus = "{{ user_status }}".trim().toLowerCase() === "enabled";
