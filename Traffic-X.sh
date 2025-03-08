@@ -17,17 +17,14 @@ sudo apt update
 echo "Installing required dependencies..."
 sudo apt install -y python3-pip python3-venv git sqlite3
 
-# Install Flask, psutil, and requests for Python3
-echo "Installing Flask, psutil, and requests for Python3..."
-pip3 install flask psutil requests
+# Create and activate a virtual environment
+echo "Setting up the Python virtual environment..."
+python3 -m venv /home/$USERNAME/Traffic-X/venv
+source /home/$USERNAME/Traffic-X/venv/bin/activate
 
-# Install Flask, psutil, and requests for Python (if pip is installed)
-if command -v pip &> /dev/null; then
-    echo "Installing Flask, psutil, and requests for Python..."
-    pip install flask psutil requests
-else
-    echo "pip not found. Skipping Flask, psutil, and requests installation for Python."
-fi
+# Install Flask, psutil, and requests in the virtual environment
+echo "Installing Flask, psutil, and requests in the virtual environment..."
+pip install flask psutil requests
 
 echo "All dependencies installed successfully! Babe"
 
@@ -39,15 +36,6 @@ git clone https://github.com/MasterHide/Traffic-X.git
 # Go to the repo directory
 cd Traffic-X
 
-# Set up a virtual environment
-echo "Setting up the Python virtual environment..."
-python3 -m venv venv
-source venv/bin/activate
-
-# Install Flask and any other required Python libraries
-echo "Installing Flask and dependencies..."
-pip install flask
-
 # Configure the Flask app to run on the specified port
 echo "Configuring Flask app..."
 cat > app.py <<EOL
@@ -57,6 +45,9 @@ import json
 import psutil
 import requests
 from datetime import datetime
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
@@ -181,7 +172,7 @@ def ping():
     return jsonify({"status": "success", "message": "Pong!"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=$PORT, debug=False)
 EOL
 
 # Set permissions for the database file
@@ -202,6 +193,10 @@ WorkingDirectory=/home/$USERNAME/Traffic-X
 ExecStart=/home/$USERNAME/Traffic-X/venv/bin/python3 /home/$USERNAME/Traffic-X/app.py
 Environment="DB_PATH=/etc/x-ui/x-ui.db"
 Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=traffic-x
 
 [Install]
 WantedBy=multi-user.target
