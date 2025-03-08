@@ -90,8 +90,8 @@ def usage():
             except (ValueError, OSError):
                 expiry_date = "Invalid Date"
 
-        # Query to fetch totalGB and user status
-        inbound_query = '''SELECT settings, enable FROM inbounds WHERE id = ?'''
+        # Query to fetch totalGB and user-specific enable status
+        inbound_query = '''SELECT settings FROM inbounds WHERE id = ?'''
         cursor.execute(inbound_query, (inbound_id,))
         inbound_row = cursor.fetchone()
 
@@ -99,13 +99,13 @@ def usage():
         user_status = "User Not Found in Inbound"
 
         if inbound_row:
-            settings, is_enabled = inbound_row
+            settings = inbound_row[0]
             try:
                 inbound_data = json.loads(settings)
                 for client in inbound_data.get('clients', []):
                     if client.get('email') == email:
                         totalGB = client.get('totalGB', "Not Available")
-                        user_status = "Enabled" if is_enabled else "Disabled"
+                        user_status = "Enabled" if client.get('enable', True) else "Disabled"  # ✅ RESTORED USER-SPECIFIC STATUS CHECK
                         break
             except json.JSONDecodeError:
                 totalGB = "Invalid JSON Data"
