@@ -59,7 +59,7 @@ def usage():
         inbound_row = cursor.fetchone()
 
         totalGB = "Not Available"
-        user_status = False  # Default to disabled if user is not found
+        user_status = "Disabled"  # Default to "Disabled" if user is not found
 
         if inbound_row:
             settings = inbound_row[0]
@@ -68,7 +68,7 @@ def usage():
                 for client in inbound_data.get('clients', []):
                     if client.get('email') == email:
                         totalGB = client.get('totalGB', "Not Available")
-                        user_status = client.get('enable', False)  # Fetch specific user's status
+                        user_status = "Enabled" if client.get('enable', True) else "Disabled"  # ✅ RESTORED USER-SPECIFIC STATUS CHECK
                         break
             except json.JSONDecodeError:
                 totalGB = "Invalid JSON Data"
@@ -97,7 +97,7 @@ def usage():
             total=total,
             expiry_date=expiry_date,
             totalGB=totalGB,
-            user_status=user_status  # Pass specific user's status
+            user_status=user_status  # Pass correct user status as a string
         )
     else:
         conn.close()
