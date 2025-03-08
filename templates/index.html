@@ -6,7 +6,273 @@
     <title>Check Usage</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Your existing CSS styles remain unchanged */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #6a1b9a, #263D9B, #742CA1, #009688);
+            background-size: 300% 300%;
+            animation: gradientAnimation 10s ease infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: white;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            padding: 20px;
+            margin-bottom: 60px; /* Added margin to prevent footer overlap */
+        }
+
+        h2 {
+            color: #fff;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .grid-container:not(.two-column) {
+            margin-bottom: 30px; /* Added margin to separate the top box from the two boxes below */
+        }
+
+        .grid-container.two-column {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h3 i {
+            font-size: 20px;
+        }
+
+        input {
+            padding: 10px;
+            width: calc(100% - 20px);
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #fff;
+            color: #333;
+        }
+
+        input:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            padding: 10px;
+            width: 100%;
+            background-color: #641B9F;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:active {
+            background-color: #004085;
+        }
+
+        .resource-item {
+            margin-bottom: 10px;
+        }
+
+        .resource-item h4 {
+            margin: 0 0 5px;
+            font-size: 14px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .resource-item h4 i {
+            font-size: 16px;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            width: 0%;
+            background: #05B031;
+            transition: width 1.5s ease-in-out;
+        }
+
+        .ping-tool {
+            text-align: center;
+        }
+
+        .ping-tool button {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #05B031;
+        }
+
+        .ping-tool button:hover {
+            background-color: #049428;
+        }
+
+        /* Ping Result Styling */
+        .ping-result {
+            margin-top: 15px; /* Added margin to separate from the button */
+            margin-bottom: 15px; /* Added margin to separate from Server Location */
+            font-size: 14px;
+            color: #fff;
+            background: rgba(5, 176, 49, 0.2); /* Light green background */
+            padding: 8px 12px;
+            border-radius: 5px;
+            display: inline-block;
+            border: 1px solid rgba(5, 176, 49, 0.5); /* Green border */
+        }
+
+        .server-location {
+            margin-top: 15px; /* Added margin to separate from Ping Result */
+            font-size: 14px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .server-location i {
+            font-size: 16px;
+        }
+
+        .server-status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .server-status i {
+            font-size: 16px;
+        }
+
+        /* Footer Styling */
+        .footer {
+            font-size: 12px;
+            color: #868e96;
+            margin-top: 20px;
+            text-align: center;
+            width: 100%;
+            padding: 10px 0;
+            position: relative; /* Changed to relative */
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer .social-icons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .footer .social-icons a {
+            color: white;
+            font-size: 16px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .footer .social-icons a:hover {
+            color: #05B031;
+            transform: scale(1.2);
+        }
+
+        @media (max-width: 600px) {
+            h2 {
+                font-size: 20px;
+            }
+
+            .grid-container.two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .card h3 {
+                font-size: 16px;
+            }
+
+            input {
+                font-size: 12px;
+            }
+
+            button {
+                font-size: 12px;
+            }
+
+            .resource-item h4 {
+                font-size: 12px;
+            }
+
+            .ping-tool button {
+                font-size: 12px;
+            }
+
+            .ping-result {
+                font-size: 12px;
+            }
+
+            .footer {
+                font-size: 10px;
+            }
+
+            .footer .social-icons a {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -18,7 +284,7 @@
         <div class="grid-container">
             <div class="card">
                 <h3><i class="fas fa-user" aria-label="User"></i>Enter User Details</h3>
-                <form id="user-form" action="/usage" method="POST">
+                <form id="user-form">
                     <input type="text" name="user_input" placeholder="Enter User Name" required>
                     <button type="submit">Check Usage</button>
                 </form>
@@ -32,23 +298,23 @@
                 <h3><i class="fas fa-server" aria-label="Server"></i>Server Resources</h3>
                 <div class="resource-item">
                     <h4><i class="fas fa-microchip" aria-label="CPU"></i>CPU Usage</h4>
-                    <p>{{ server_resources.cpu_usage }}% ({{ server_resources.cpu_cores }} cores)</p>
+                    <p id="cpu-usage">25%</p>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: {{ server_resources.cpu_usage }}%;"></div>
+                        <div class="progress-bar" id="cpu-progress" style="width: 25%;"></div>
                     </div>
                 </div>
                 <div class="resource-item">
                     <h4><i class="fas fa-memory" aria-label="Memory"></i>Memory Usage</h4>
-                    <p>{{ server_resources.ram_used }} / {{ server_resources.ram_total }} ({{ server_resources.ram_percent }}%)</p>
+                    <p id="memory-usage">4 GB / 16 GB (25%)</p>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: {{ server_resources.ram_percent }}%;"></div>
+                        <div class="progress-bar" id="memory-progress" style="width: 25%;"></div>
                     </div>
                 </div>
                 <div class="resource-item">
                     <h4><i class="fas fa-hdd" aria-label="Disk"></i>Disk Usage</h4>
-                    <p>{{ server_resources.disk_used }} / {{ server_resources.disk_total }} ({{ server_resources.disk_percent }}%)</p>
+                    <p id="disk-usage">50 GB / 200 GB (25%)</p>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: {{ server_resources.disk_percent }}%;"></div>
+                        <div class="progress-bar" id="disk-progress" style="width: 25%;"></div>
                     </div>
                 </div>
             </div>
