@@ -122,11 +122,6 @@
             <div class="progress-bar" id="limit-bar"></div>
         </div>
     </div>
-    <div class="info">Total GB: {{ totalGB }} 
-        <div class="progress-container">
-            <div class="progress-bar" id="totalGB-bar"></div>
-        </div>
-    </div>
     <div class="info">Expiry Date: {{ expiry_date }}</div>
     <div class="info toggle-container">
         <span>Config Status:</span>
@@ -158,19 +153,16 @@
     let uploadedUnit = "{{ up }}".replace(/[^a-zA-Z]/g, ''); // Extract "MB", "GB", etc.
     let downloadedUnit = "{{ down }}".replace(/[^a-zA-Z]/g, '');
     let totalLimitUnit = "{{ total }}".replace(/[^a-zA-Z]/g, '');
-    let totalGBUnit = "{{ totalGB }}".replace(/[^a-zA-Z]/g, '');
 
     // Get dynamic values from Flask backend
     let uploaded = parseValue("{{ up }}");
     let downloaded = parseValue("{{ down }}");
     let totalLimit = parseValue("{{ total }}");
-    let totalGB = parseValue("{{ totalGB }}");
 
     // Convert all values to MB
     uploaded = convertToMB(uploaded, uploadedUnit);
     downloaded = convertToMB(downloaded, downloadedUnit);
     totalLimit = convertToMB(totalLimit, totalLimitUnit);
-    totalGB = convertToMB(totalGB, totalGBUnit);
 
     // Calculate total usage (uploaded + downloaded)
     let totalUsage = uploaded + downloaded;
@@ -207,9 +199,6 @@
 
             // Total usage progress bar
             animateProgressBar("limit-bar", totalUsage, totalLimit);
-
-            // Total GB progress bar
-            animateProgressBar("totalGB-bar", totalGB, totalLimit);
         }
     }, 500);
 
