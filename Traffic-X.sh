@@ -17,6 +17,20 @@ sudo apt update
 echo "Installing required dependencies..."
 sudo apt install -y python3-pip python3-venv git sqlite3
 
+# Install psutil for Python3
+echo "Installing psutil for Python3..."
+pip3 install psutil
+
+# Install psutil for Python (if pip is installed)
+if command -v pip &> /dev/null; then
+    echo "Installing psutil for Python..."
+    pip install psutil
+else
+    echo "pip not found. Skipping psutil installation for Python."
+fi
+
+echo "All dependencies installed successfully!"
+
 # Clone your GitHub repository
 echo "Cloning your repository from GitHub..."
 cd /home/$USERNAME
@@ -41,6 +55,7 @@ from flask import Flask, request, render_template
 import sqlite3
 import json
 from datetime import datetime
+import psutil  # For fetching CPU, RAM, and disk usage
 
 app = Flask(__name__)
 
@@ -61,9 +76,40 @@ def convert_bytes(byte_size):
     else:
         return f"{round(byte_size / (1024 * 1024 * 1024 * 1024), 2)} TB"
 
+def get_system_resources():
+    """Fetch real-time CPU, RAM, and disk usage."""
+    # CPU Usage
+    cpu_cores = psutil.cpu_count(logical=True)  # Number of CPU cores
+    cpu_usage = psutil.cpu_percent(interval=1)  # CPU usage percentage
+
+    # RAM Usage
+    ram = psutil.virtual_memory()
+    ram_used = convert_bytes(ram.used)
+    ram_total = convert_bytes(ram.total)
+    ram_percent = ram.percent
+
+    # Disk Usage
+    disk = psutil.disk_usage('/')
+    disk_used = convert_bytes(disk.used)
+    disk_total = convert_bytes(disk.total)
+    disk_percent = disk.percent
+
+    return {
+        "cpu_cores": cpu_cores,
+        "cpu_usage": cpu_usage,
+        "ram_used": ram_used,
+        "ram_total": ram_total,
+        "ram_percent": ram_percent,
+        "disk_used": disk_used,
+        "disk_total": disk_total,
+        "disk_percent": disk_percent,
+    }
+
 @app.route('/')
 def home():
-    return render_template('index.html')
+    # Fetch real-time system resources
+    server_resources = get_system_resources()
+    return render_template('index.html', server_resources=server_resources)
 
 @app.route('/usage', methods=['POST'])
 def usage():
