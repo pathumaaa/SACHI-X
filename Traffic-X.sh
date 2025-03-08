@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Ask user for necessary information
-echo "Enter your Os username (e.g., ubuntu):"
+echo "Enter your OS username (e.g., ubuntu):"
 read USERNAME
 echo "Enter your server IP or domain (e.g., 158.170.000.000 or your_domain.com):"
 read SERVER_IP
-echo "Enter the port type 5000 (default: 5000):"
+echo "Enter the port (default: 5000):"
 read PORT
 PORT=${PORT:-5000}
 
@@ -17,27 +17,26 @@ sudo apt update
 echo "Installing required dependencies..."
 sudo apt install -y python3-pip python3-venv git sqlite3
 
-# Install psutil for Python3
-echo "Installing psutil for Python3..."
-pip3 install psutil
-
-# Install psutil for Python (if pip is installed)
-if command -v pip &> /dev/null; then
-    echo "Installing psutil for Python..."
-    pip install psutil
-else
-    echo "pip not found. Skipping psutil installation for Python."
-fi
-
-echo "All dependencies installed successfully!"
-
 # Clone your GitHub repository
 echo "Cloning your repository from GitHub..."
 cd /home/$USERNAME
-git clone https://github.com/MasterHide/Traffic-X.git
+if git clone https://github.com/MasterHide/Traffic-X.git; then
+    echo "Repository cloned successfully."
+else
+    echo "Failed to clone repository. Exiting."
+    exit 1
+fi
 
 # Go to the repo directory
 cd Traffic-X
+
+# Verify the templates directory exists
+if [ -d "/home/$USERNAME/Traffic-X/templates" ]; then
+    echo "Templates directory found."
+else
+    echo "Templates directory not found. Exiting."
+    exit 1
+fi
 
 # Set up a virtual environment
 echo "Setting up the Python virtual environment..."
@@ -46,7 +45,7 @@ source venv/bin/activate
 
 # Install Flask and any other required Python libraries
 echo "Installing Flask and dependencies..."
-pip install flask
+pip install flask psutil requests
 
 # Configure the Flask app to run on the specified port
 echo "Configuring Flask app..."
@@ -184,6 +183,11 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
 EOL
 
+# Set permissions for the database file
+echo "Setting permissions for the database file..."
+sudo chmod 644 /etc/x-ui/x-ui.db
+sudo chown $USERNAME:$USERNAME /etc/x-ui/x-ui.db
+
 # Create a systemd service to keep the Flask app running
 echo "Setting up systemd service..."
 cat > /etc/systemd/system/traffic-x.service <<EOL
@@ -195,7 +199,12 @@ After=network.target
 User=$USERNAME
 WorkingDirectory=/home/$USERNAME/Traffic-X
 ExecStart=/home/$USERNAME/Traffic-X/venv/bin/python3 /home/$USERNAME/Traffic-X/app.py
+Environment="DB_PATH=/etc/x-ui/x-ui.db"
 Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=traffic-x
 
 [Install]
 WantedBy=multi-user.target
