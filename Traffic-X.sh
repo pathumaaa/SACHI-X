@@ -181,8 +181,13 @@ def ping():
     return jsonify({"status": "success", "message": "Pong!"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
 EOL
+
+# Set permissions for the database file
+echo "Setting permissions for the database file..."
+sudo chmod 644 /etc/x-ui/x-ui.db
+sudo chown $USERNAME:$USERNAME /etc/x-ui/x-ui.db
 
 # Create a systemd service to keep the Flask app running
 echo "Setting up systemd service..."
@@ -195,6 +200,7 @@ After=network.target
 User=$USERNAME
 WorkingDirectory=/home/$USERNAME/Traffic-X
 ExecStart=/home/$USERNAME/Traffic-X/venv/bin/python3 /home/$USERNAME/Traffic-X/app.py
+Environment="DB_PATH=/etc/x-ui/x-ui.db"
 Restart=always
 
 [Install]
