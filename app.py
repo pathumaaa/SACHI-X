@@ -82,6 +82,14 @@ def usage():
         total = convert_bytes(total)
         totalGB = convert_bytes(totalGB) if totalGB != "Not Available" else totalGB
 
+        # Debugging: Print values being passed to the template
+        print(f"Email: {email}")
+        print(f"Uploaded: {up}")
+        print(f"Downloaded: {down}")
+        print(f"Total: {total}")
+        print(f"Expiry Date: {expiry_date}")
+        print(f"User Status: {user_status}")
+
         return render_template(
             'result.html',
             email=email,
