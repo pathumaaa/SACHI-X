@@ -4,14 +4,10 @@ import json
 import psutil
 import requests
 from datetime import datetime
-import os  # For checking file paths
 
 app = Flask(__name__)
 
 db_path = "/etc/x-ui/x-ui.db"  # Adjust path if necessary
-
-# SSL certificate base directory
-ssl_cert_base_dir = "/root/cert/"
 
 def convert_bytes(byte_size):
     """Convert bytes to a human-readable format (MB, GB, TB)."""
@@ -147,41 +143,8 @@ def ping():
     """Endpoint for ping test."""
     return jsonify({"status": "success", "message": "Pong!"})
 
-def find_ssl_certificates(domain):
-    """Find SSL certificate and key files for a specific domain."""
-    cert_path = os.path.join(ssl_cert_base_dir, domain, "fullchain.pem")
-    key_path = os.path.join(ssl_cert_base_dir, domain, "privkey.pem")
-    
-    if os.path.exists(cert_path) and os.path.exists(key_path):
-        print(f"SSL certificates found at: {cert_path}, {key_path}")
-        return cert_path, key_path
-    else:
-        print(f"No SSL certificates found for domain: {domain}")
-        return None, None
-
 if __name__ == '__main__':
-    # Read domain and port from configuration file
-    config_file = "/etc/x-ui/config.cfg"
-    if os.path.exists(config_file):
-        with open(config_file, "r") as f:
-            for line in f:
-                if line.startswith("DOMAIN="):
-                    target_domain = line.strip().split("=")[1]
-                elif line.startswith("PORT="):
-                    port = int(line.strip().split("=")[1])
+    if [ "$ENABLE_HTTPS" = "yes" ]; then
+        app.run(host='0.0.0.0', port=$PORT, ssl_context=('$CERT_PATH', '$KEY_PATH'), debug=True)
     else:
-        target_domain = None
-        port = 5000  # Default port
-
-    # Use the domain to find SSL certificates
-    if target_domain:
-        ssl_cert_path, ssl_key_path = find_ssl_certificates(target_domain)
-        if ssl_cert_path and ssl_key_path:
-            print(f"SSL certificate found for {target_domain}. Starting Flask with HTTPS on port {port}...")
-            app.run(host='0.0.0.0', port=port, debug=True, ssl_context=(ssl_cert_path, ssl_key_path))
-        else:
-            print(f"No SSL certificate found for {target_domain}. Starting Flask with HTTP on port {port}...")
-            app.run(host='0.0.0.0', port=port, debug=True)
-    else:
-        print(f"No domain configured. Starting Flask with HTTP on port {port}...")
-        app.run(host='0.0.0.0', port=port, debug=True)
+        app.run(host='0.0.0.0', port=$PORT, debug=True)
