@@ -3,7 +3,7 @@
 # Ask user for necessary information
 echo "Enter your OS username (e.g., ubuntu):"
 read USERNAME
-echo "Enter your SSL ENABLED domain (e.g. domain.com):"
+echo "Enter your SSL ENABLED domain (e.g., ssl.darkevill.click):"
 read SERVER_DOMAIN
 echo "Enter the port (default: 5000):"
 read PORT
@@ -13,6 +13,12 @@ PORT=${PORT:-5000}  # Default to 5000 if no input is provided
 echo "Saving domain and port to configuration file..."
 echo "DOMAIN=$SERVER_DOMAIN" > /etc/x-ui/config.cfg
 echo "PORT=$PORT" >> /etc/x-ui/config.cfg
+
+# Grant the ubuntu user access to /root/cert/
+echo "Granting the ubuntu user access to /root/cert/..."
+sudo usermod -aG root $USERNAME
+sudo chown -R root:root /root/cert/
+sudo chmod -R 750 /root/cert/
 
 # Install required dependencies
 echo "Updating packages..."
@@ -86,5 +92,5 @@ sudo systemctl enable traffic-x
 sudo systemctl start traffic-x
 
 # Display success message
-echo "Installation complete! Your server is running at http://$SERVER_DOMAIN:$PORT"
+echo "Installation complete! Your server is running at https://$SERVER_DOMAIN:$PORT"
 echo "The app will automatically restart if the server reboots."
