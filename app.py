@@ -144,7 +144,4 @@ def ping():
     return jsonify({"status": "success", "message": "Pong!"})
 
 if __name__ == '__main__':
-    if [ "$ENABLE_HTTPS" = "yes" ]; then
-        app.run(host='0.0.0.0', port=$PORT, ssl_context=('$CERT_PATH', '$KEY_PATH'), debug=True)
-    else:
-        app.run(host='0.0.0.0', port=$PORT, debug=True)
+    app.run(host='0.0.0.0', port=$PORT, debug=True)
