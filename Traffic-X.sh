@@ -255,7 +255,7 @@ After=network.target
 [Service]
 User=$USERNAME
 WorkingDirectory=/home/$USERNAME/Traffic-X
-ExecStart=/home/$USERNAME/Traffic-X/venv/bin/python3 /home/$USERNAME/Traffic-X/app.py
+ExecStart=/bin/bash -c 'source /home/$USERNAME/Traffic-X/venv/bin/activate && exec python3 /home/$USERNAME/Traffic-X/app.py'
 Environment="DB_PATH=/etc/x-ui/x-ui.db"
 Restart=always
 RestartSec=5
