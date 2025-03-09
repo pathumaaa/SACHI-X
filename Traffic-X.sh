@@ -204,14 +204,42 @@ echo "Setting permissions for the database file..."
 sudo chmod 644 /etc/x-ui/x-ui.db
 sudo chown $USERNAME:$USERNAME /etc/x-ui/x-ui.db
 
-# Install acme.sh and generate SSL certificate
-echo "Installing acme.sh and generating SSL certificate..."
+# Install acme.sh
+echo "Installing acme.sh..."
 curl https://get.acme.sh | sh -s email=$USERNAME@$SERVER_IP
 export DOMAIN=$SERVER_IP
 mkdir -p /var/lib/marzban/certs
-~/.acme.sh/acme.sh --issue --force --standalone -d "$DOMAIN" \
-    --fullchain-file "/var/lib/marzban/certs/$DOMAIN.cer" \
-    --key-file "/var/lib/marzban/certs/$DOMAIN.cer.key"
+
+# Check if valid certificate already exists
+if [ -f "/var/lib/marzban/certs/$DOMAIN.cer" ] && [ -f "/var/lib/marzban/certs/$DOMAIN.cer.key" ]; then
+    echo "Valid SSL certificate already exists. Skipping certificate generation."
+else
+    echo "Generating SSL certificate..."
+    ~/.acme.sh/acme.sh --issue --force --standalone -d "$DOMAIN" \
+        --fullchain-file "/var/lib/marzban/certs/$DOMAIN.cer" \
+        --key-file "/var/lib/marzban/certs/$DOMAIN.cer.key"
+fi
+
+# Check certificate expiration date
+if [ -f "/var/lib/marzban/certs/$DOMAIN.cer" ]; then
+    EXPIRY_DATE=$(openssl x509 -enddate -noout -in "/var/lib/marzban/certs/$DOMAIN.cer" | cut -d= -f2)
+    EXPIRY_TIMESTAMP=$(date -d "$EXPIRY_DATE" +%s)
+    CURRENT_TIMESTAMP=$(date +%s)
+    DAYS_LEFT=$(( (EXPIRY_TIMESTAMP - CURRENT_TIMESTAMP) / 86400 ))
+
+    if [ "$DAYS_LEFT" -lt 30 ]; then
+        echo "Certificate is close to expiration (expires in $DAYS_LEFT days). Renewing certificate..."
+        ~/.acme.sh/acme.sh --renew -d "$DOMAIN" --force
+    else
+        echo "Certificate is valid for $DAYS_LEFT days. Skipping renewal."
+    fi
+fi
+
+# Stop any existing instance of the Flask app
+if sudo systemctl is-active --quiet traffic-x; then
+    echo "Stopping existing Traffic-X service..."
+    sudo systemctl stop traffic-x
+fi
 
 # Configure Flask to use HTTPS
 echo "Configuring Flask to use HTTPS..."
