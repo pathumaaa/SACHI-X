@@ -153,8 +153,11 @@ def find_ssl_certificates(domain):
     key_path = os.path.join(ssl_cert_base_dir, domain, "privkey.pem")
     
     if os.path.exists(cert_path) and os.path.exists(key_path):
+        print(f"SSL certificates found at: {cert_path}, {key_path}")
         return cert_path, key_path
-    return None, None
+    else:
+        print(f"No SSL certificates found for domain: {domain}")
+        return None, None
 
 if __name__ == '__main__':
     # Read domain and port from configuration file
