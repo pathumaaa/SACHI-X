@@ -9,24 +9,13 @@ echo "Enter the port (default: 5000):"
 read PORT
 PORT=${PORT:-5000}
 
-# Ask user if they want to enable HTTPS
-echo "Do you want to enable HTTPS? (yes/no):"
-read ENABLE_HTTPS
-
-if [ "$ENABLE_HTTPS" = "yes" ]; then
-    echo "Enter the path to your public certificate (e.g., /root/cert/ssl.darkevill.click/fullchain.pem):"
-    read CERT_PATH
-    echo "Enter the path to your private key (e.g., /root/cert/ssl.darkevill.click/privkey.pem):"
-    read KEY_PATH
-fi
-
 # Install required dependencies
 echo "Updating packages..."
 sudo apt update
 
-# Install Python3, pip, git, and other required dependencies
+# Install Python3, pip, git, socat, and other required dependencies
 echo "Installing required dependencies..."
-sudo apt install -y python3-pip python3-venv git sqlite3
+sudo apt install -y python3-pip python3-venv git sqlite3 socat
 
 # Clone your GitHub repository
 echo "Cloning your repository from GitHub..."
@@ -207,16 +196,26 @@ def ping():
     return jsonify({"status": "success", "message": "Pong!"})
 
 if __name__ == '__main__':
-    if [ "$ENABLE_HTTPS" = "yes" ]; then
-        app.run(host='0.0.0.0', port=$PORT, ssl_context=('$CERT_PATH', '$KEY_PATH'), debug=True)
-    else:
-        app.run(host='0.0.0.0', port=$PORT, debug=True)
+    app.run(host='0.0.0.0', port=$PORT, debug=True)
 EOL
 
 # Set permissions for the database file
 echo "Setting permissions for the database file..."
 sudo chmod 644 /etc/x-ui/x-ui.db
 sudo chown $USERNAME:$USERNAME /etc/x-ui/x-ui.db
+
+# Install acme.sh and generate SSL certificate
+echo "Installing acme.sh and generating SSL certificate..."
+curl https://get.acme.sh | sh -s email=$USERNAME@$SERVER_IP
+export DOMAIN=$SERVER_IP
+mkdir -p /var/lib/marzban/certs
+~/.acme.sh/acme.sh --issue --force --standalone -d "$DOMAIN" \
+    --fullchain-file "/var/lib/marzban/certs/$DOMAIN.cer" \
+    --key-file "/var/lib/marzban/certs/$DOMAIN.cer.key"
+
+# Configure Flask to use HTTPS
+echo "Configuring Flask to use HTTPS..."
+sed -i "s/app.run(host='0.0.0.0', port=$PORT, debug=True)/app.run(host='0.0.0.0', port=$PORT, ssl_context=('\/var\/lib\/marzban\/certs\/$DOMAIN.cer', '\/var\/lib\/marzban\/certs\/$DOMAIN.cer.key'), debug=True)/" app.py
 
 # Create a systemd service to keep the Flask app running
 echo "Setting up systemd service..."
@@ -247,9 +246,5 @@ sudo systemctl enable traffic-x
 sudo systemctl start traffic-x
 
 # Display success message
-if [ "$ENABLE_HTTPS" = "yes" ]; then
-    echo "Installation complete! Your server is running at https://$SERVER_IP:$PORT"
-else
-    echo "Installation complete! Your server is running at http://$SERVER_IP:$PORT"
-fi
+echo "Installation complete! Your server is running at https://$SERVER_IP:$PORT"
 echo "The app will automatically restart if the server reboots."
