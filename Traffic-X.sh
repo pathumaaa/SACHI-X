@@ -67,6 +67,10 @@ else
         --fullchain-file "/var/lib/Traffic-X/certs/$DOMAIN.cer" \
         --key-file "/var/lib/Traffic-X/certs/$DOMAIN.cer.key"
 
+    # Fix ownership of the generated certificates
+    sudo chown $USERNAME:$USERNAME /var/lib/Traffic-X/certs/$DOMAIN.cer
+    sudo chown $USERNAME:$USERNAME /var/lib/Traffic-X/certs/$DOMAIN.cer.key
+
     # Verify certificate generation
     if [ ! -f "/var/lib/Traffic-X/certs/$DOMAIN.cer" ] || [ ! -f "/var/lib/Traffic-X/certs/$DOMAIN.cer.key" ]; then
         echo "Failed to generate SSL certificates. Disabling SSL."
