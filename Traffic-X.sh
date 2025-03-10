@@ -195,7 +195,7 @@ def ping():
     return jsonify({"status": "success", "message": "Pong!"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=$PORT, ssl_context=('/var/lib/marzban/certs/$DOMAIN.cer', '/var/lib/marzban/certs/$DOMAIN.cer.key'), debug=False)
+    app.run(host='0.0.0.0', port=$PORT, debug=False)
 EOL
 
 # Set permissions for the database file
@@ -217,6 +217,15 @@ else
     ~/.acme.sh/acme.sh --issue --force --standalone -d "$DOMAIN" \
         --fullchain-file "/var/lib/marzban/certs/$DOMAIN.cer" \
         --key-file "/var/lib/marzban/certs/$DOMAIN.cer.key"
+
+    # Verify certificate generation
+    if [ ! -f "/var/lib/marzban/certs/$DOMAIN.cer" ] || [ ! -f "/var/lib/marzban/certs/$DOMAIN.cer.key" ]; then
+        echo "Failed to generate SSL certificates. Disabling SSL."
+        SSL_CONTEXT=""
+    else
+        echo "SSL certificates generated successfully."
+        SSL_CONTEXT=", ssl_context=('/var/lib/marzban/certs/$DOMAIN.cer', '/var/lib/marzban/certs/$DOMAIN.cer.key')"
+    fi
 fi
 
 # Stop any existing instance of the Flask app
@@ -254,5 +263,9 @@ sudo systemctl enable traffic-x
 sudo systemctl start traffic-x
 
 # Display success message
-echo "Installation complete! Your server is running at https://$SERVER_IP:$PORT"
-echo "The app will automatically restart if the server reboots."
+echo "Installation complete! Your server is running at http://$SERVER_IP:$PORT"
+if [ -n "$SSL_CONTEXT" ]; then
+    echo "SSL is enabled. Access the app securely at https://$SERVER_IP:$PORT"
+else
+    echo "SSL is disabled. Access the app at http://$SERVER_IP:$PORT"
+fi
