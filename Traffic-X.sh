@@ -50,6 +50,31 @@ pip install flask psutil requests
 
 # Configure the Flask app to run on the specified port
 echo "Configuring Flask app..."
+export DOMAIN=$SERVER_IP
+mkdir -p /var/lib/marzban/certs
+
+# Check if valid certificate already exists
+if [ -f "/var/lib/marzban/certs/$DOMAIN.cer" ] && [ -f "/var/lib/marzban/certs/$DOMAIN.cer.key" ]; then
+    echo "Valid SSL certificate already exists."
+    SSL_CONTEXT=", ssl_context=('/var/lib/marzban/certs/$DOMAIN.cer', '/var/lib/marzban/certs/$DOMAIN.cer.key')"
+else
+    echo "Generating SSL certificate..."
+    curl https://get.acme.sh | sh -s email=$USERNAME@$SERVER_IP
+    ~/.acme.sh/acme.sh --issue --force --standalone -d "$DOMAIN" \
+        --fullchain-file "/var/lib/marzban/certs/$DOMAIN.cer" \
+        --key-file "/var/lib/marzban/certs/$DOMAIN.cer.key"
+
+    # Verify certificate generation
+    if [ ! -f "/var/lib/marzban/certs/$DOMAIN.cer" ] || [ ! -f "/var/lib/marzban/certs/$DOMAIN.cer.key" ]; then
+        echo "Failed to generate SSL certificates. Disabling SSL."
+        SSL_CONTEXT=""
+    else
+        echo "SSL certificates generated successfully."
+        SSL_CONTEXT=", ssl_context=('/var/lib/marzban/certs/$DOMAIN.cer', '/var/lib/marzban/certs/$DOMAIN.cer.key')"
+    fi
+fi
+
+# Generate app.py with SSL context handling
 cat > app.py <<EOL
 from flask import Flask, request, render_template, jsonify
 import sqlite3
@@ -195,38 +220,13 @@ def ping():
     return jsonify({"status": "success", "message": "Pong!"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=$PORT, debug=False)
+    app.run(host='0.0.0.0', port=$PORT, debug=False$SSL_CONTEXT)
 EOL
 
 # Set permissions for the database file
 echo "Setting permissions for the database file..."
 sudo chmod 644 /etc/x-ui/x-ui.db
 sudo chown $USERNAME:$USERNAME /etc/x-ui/x-ui.db
-
-# Install acme.sh
-echo "Installing acme.sh..."
-curl https://get.acme.sh | sh -s email=$USERNAME@$SERVER_IP
-export DOMAIN=$SERVER_IP
-mkdir -p /var/lib/marzban/certs
-
-# Check if valid certificate already exists
-if [ -f "/var/lib/marzban/certs/$DOMAIN.cer" ] && [ -f "/var/lib/marzban/certs/$DOMAIN.cer.key" ]; then
-    echo "Valid SSL certificate already exists. Skipping certificate generation."
-else
-    echo "Generating SSL certificate..."
-    ~/.acme.sh/acme.sh --issue --force --standalone -d "$DOMAIN" \
-        --fullchain-file "/var/lib/marzban/certs/$DOMAIN.cer" \
-        --key-file "/var/lib/marzban/certs/$DOMAIN.cer.key"
-
-    # Verify certificate generation
-    if [ ! -f "/var/lib/marzban/certs/$DOMAIN.cer" ] || [ ! -f "/var/lib/marzban/certs/$DOMAIN.cer.key" ]; then
-        echo "Failed to generate SSL certificates. Disabling SSL."
-        SSL_CONTEXT=""
-    else
-        echo "SSL certificates generated successfully."
-        SSL_CONTEXT=", ssl_context=('/var/lib/marzban/certs/$DOMAIN.cer', '/var/lib/marzban/certs/$DOMAIN.cer.key')"
-    fi
-fi
 
 # Stop any existing instance of the Flask app
 if sudo systemctl is-active --quiet traffic-x; then
