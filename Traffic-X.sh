@@ -51,26 +51,29 @@ pip install flask psutil requests
 # Configure the Flask app to run on the specified port
 echo "Configuring Flask app..."
 export DOMAIN=$SERVER_IP
-mkdir -p /var/lib/marzban/certs
+
+# Create a custom directory for SSL certificates
+mkdir -p /var/lib/Traffic-X/certs
+sudo chown -R $USERNAME:$USERNAME /var/lib/Traffic-X/certs
 
 # Check if valid certificate already exists
-if [ -f "/var/lib/marzban/certs/$DOMAIN.cer" ] && [ -f "/var/lib/marzban/certs/$DOMAIN.cer.key" ]; then
+if [ -f "/var/lib/Traffic-X/certs/$DOMAIN.cer" ] && [ -f "/var/lib/Traffic-X/certs/$DOMAIN.cer.key" ]; then
     echo "Valid SSL certificate already exists."
-    SSL_CONTEXT=", ssl_context=('/var/lib/marzban/certs/$DOMAIN.cer', '/var/lib/marzban/certs/$DOMAIN.cer.key')"
+    SSL_CONTEXT=", ssl_context=('/var/lib/Traffic-X/certs/$DOMAIN.cer', '/var/lib/Traffic-X/certs/$DOMAIN.cer.key')"
 else
     echo "Generating SSL certificate..."
     curl https://get.acme.sh | sh -s email=$USERNAME@$SERVER_IP
     ~/.acme.sh/acme.sh --issue --force --standalone -d "$DOMAIN" \
-        --fullchain-file "/var/lib/marzban/certs/$DOMAIN.cer" \
-        --key-file "/var/lib/marzban/certs/$DOMAIN.cer.key"
+        --fullchain-file "/var/lib/Traffic-X/certs/$DOMAIN.cer" \
+        --key-file "/var/lib/Traffic-X/certs/$DOMAIN.cer.key"
 
     # Verify certificate generation
-    if [ ! -f "/var/lib/marzban/certs/$DOMAIN.cer" ] || [ ! -f "/var/lib/marzban/certs/$DOMAIN.cer.key" ]; then
+    if [ ! -f "/var/lib/Traffic-X/certs/$DOMAIN.cer" ] || [ ! -f "/var/lib/Traffic-X/certs/$DOMAIN.cer.key" ]; then
         echo "Failed to generate SSL certificates. Disabling SSL."
         SSL_CONTEXT=""
     else
         echo "SSL certificates generated successfully."
-        SSL_CONTEXT=", ssl_context=('/var/lib/marzban/certs/$DOMAIN.cer', '/var/lib/marzban/certs/$DOMAIN.cer.key')"
+        SSL_CONTEXT=", ssl_context=('/var/lib/Traffic-X/certs/$DOMAIN.cer', '/var/lib/Traffic-X/certs/$DOMAIN.cer.key')"
     fi
 fi
 
@@ -244,12 +247,12 @@ After=network.target
 [Service]
 User=$USERNAME
 WorkingDirectory=/home/$USERNAME/Traffic-X
-ExecStart=/home/$USERNAME/Traffic-X/venv/bin/python3 /home/$USERNAME/Traffic-X/app.py
+ExecStart=/bin/bash -c 'source /home/$USERNAME/Traffic-X/venv/bin/activate && exec /home/$USERNAME/Traffic-X/venv/bin/python3 /home/$USERNAME/Traffic-X/app.py'
 Environment="DB_PATH=/etc/x-ui/x-ui.db"
 Restart=on-failure
 RestartSec=5
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=append:/var/log/traffic-x.log
+StandardError=append:/var/log/traffic-x.log
 SyslogIdentifier=traffic-x
 
 [Install]
