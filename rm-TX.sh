@@ -21,9 +21,13 @@ sudo rm -f /etc/systemd/system/traffic-x.service
 # Reload systemd to reflect changes
 sudo systemctl daemon-reload
 
+# Ask for the OS username used during installation
+echo "Enter the OS username used during installation (e.g., ubuntu):"
+read USERNAME
+
 # Remove the Traffic-X directory and its contents
 echo "Removing the Traffic-X directory..."
-rm -rf /home/$USER/Traffic-X
+sudo rm -rf /home/$USERNAME/Traffic-X
 
 # Remove SSL certificates
 echo "Removing SSL certificates..."
