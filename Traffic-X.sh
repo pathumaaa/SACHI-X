@@ -38,7 +38,7 @@ done
 # Ask user for necessary information
 echo "Enter your OS username (e.g., ubuntu):"
 read USERNAME
-echo "Enter your server IP or domain (e.g., 158.170.000.000 or your_domain.com):"
+echo "Enter your server domain (e.g.your_domain.com):"
 read SERVER_IP
 echo "Enter the port (default: 5000):"
 read PORT
