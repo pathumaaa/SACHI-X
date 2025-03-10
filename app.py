@@ -142,4 +142,4 @@ def ping():
     return jsonify({"status": "success", "message": "Pong!"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=$PORT, ssl_context=('/var/lib/marzban/certs/$DOMAIN.cer', '/var/lib/marzban/certs/$DOMAIN.cer.key'), debug=False)
+    app.run(host='0.0.0.0', port=$PORT, debug=False)
