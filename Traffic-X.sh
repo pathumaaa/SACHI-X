@@ -1,5 +1,40 @@
 #!/bin/bash
 
+# Function to display the menu
+show_menu() {
+    echo "Welcome to Traffic-X Installer/Uninstaller"
+    echo "Please choose an option:"
+    echo "1. Run Traffic-X (Install)"
+    echo "2. Uninstall Traffic-X"
+    echo "3. Exit"
+}
+
+# Main menu logic
+while true; do
+    show_menu
+    read -p "Enter your choice [1-3]: " CHOICE
+
+    case $CHOICE in
+        1)
+            echo "Proceeding with Traffic-X installation..."
+            break
+            ;;
+        2)
+            echo "Uninstalling Traffic-X..."
+            bash <(curl -s https://raw.githubusercontent.com/MasterHide/Traffic-X/main/rm-TX.sh)
+            echo "Traffic-X has been uninstalled."
+            exit 0
+            ;;
+        3)
+            echo "Exiting..."
+            exit 0
+            ;;
+        *)
+            echo "Invalid choice. Please select a valid option [1-3]."
+            ;;
+    esac
+done
+
 # Ask user for necessary information
 echo "Enter your OS username (e.g., ubuntu):"
 read USERNAME
