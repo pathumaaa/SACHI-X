@@ -32,7 +32,7 @@ while true; do
             ;;
         2)
             echo "Uninstalling Traffic-X..."
-            bash <(curl -s https://raw.githubusercontent.com/MasterHide/Traffic-X/main/rm-TX.sh)
+            bash <(curl -s https://raw.githubusercontent.com/Tyga-x/Traffic-X/main/rm-TX.sh)
             echo "Traffic-X has been uninstalled."
             exit 0
             ;;
