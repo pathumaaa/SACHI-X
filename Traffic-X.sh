@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # @fileOverview Check usage stats of X-SL
 # @author MasterHide
 # @Copyright © 2025 x404 MASTER™
@@ -9,7 +8,6 @@
 # without the express written consent of the copyright owner.
 #
 # For more information, visit: https://t.me/Dark_Evi
-
 
 # Function to display the menu
 show_menu() {
@@ -24,7 +22,6 @@ show_menu() {
 while true; do
     show_menu
     read -p "Enter your choice [1-3]: " CHOICE
-
     case $CHOICE in
         1)
             echo "Proceeding with Traffic-X installation..."
@@ -89,10 +86,10 @@ echo "Setting up the Python virtual environment..."
 python3 -m venv venv
 source venv/bin/activate
 
-# Install Flask and any other required Python libraries
-echo "Installing Flask and dependencies..."
+# Install Flask, Gunicorn, and other required Python libraries
+echo "Installing Flask, Gunicorn, and dependencies..."
 pip install --upgrade pip
-pip install flask psutil requests
+pip install flask gunicorn psutil requests
 
 # Configure the Flask app to run on the specified port
 echo "Configuring Flask app..."
@@ -105,25 +102,23 @@ sudo chown -R $USERNAME:$USERNAME /var/lib/Traffic-X/certs
 # Check if valid certificate already exists
 if [ -f "/var/lib/Traffic-X/certs/$DOMAIN.cer" ] && [ -f "/var/lib/Traffic-X/certs/$DOMAIN.cer.key" ]; then
     echo "Valid SSL certificate already exists."
-    SSL_CONTEXT=", ssl_context=('/var/lib/Traffic-X/certs/$DOMAIN.cer', '/var/lib/Traffic-X/certs/$DOMAIN.cer.key')"
+    SSL_CONTEXT="--certfile=/var/lib/Traffic-X/certs/$DOMAIN.cer --keyfile=/var/lib/Traffic-X/certs/$DOMAIN.cer.key"
 else
     echo "Generating SSL certificate..."
     curl https://get.acme.sh | sh -s email=$USERNAME@$SERVER_IP
     ~/.acme.sh/acme.sh --issue --force --standalone -d "$DOMAIN" \
         --fullchain-file "/var/lib/Traffic-X/certs/$DOMAIN.cer" \
         --key-file "/var/lib/Traffic-X/certs/$DOMAIN.cer.key"
-
     # Fix ownership of the generated certificates
     sudo chown $USERNAME:$USERNAME /var/lib/Traffic-X/certs/$DOMAIN.cer
     sudo chown $USERNAME:$USERNAME /var/lib/Traffic-X/certs/$DOMAIN.cer.key
-
     # Verify certificate generation
     if [ ! -f "/var/lib/Traffic-X/certs/$DOMAIN.cer" ] || [ ! -f "/var/lib/Traffic-X/certs/$DOMAIN.cer.key" ]; then
         echo "Failed to generate SSL certificates. Disabling SSL."
         SSL_CONTEXT=""
     else
         echo "SSL certificates generated successfully."
-        SSL_CONTEXT=", ssl_context=('/var/lib/Traffic-X/certs/$DOMAIN.cer', '/var/lib/Traffic-X/certs/$DOMAIN.cer.key')"
+        SSL_CONTEXT="--certfile=/var/lib/Traffic-X/certs/$DOMAIN.cer --keyfile=/var/lib/Traffic-X/certs/$DOMAIN.cer.key"
     fi
 fi
 
@@ -137,7 +132,6 @@ import requests
 from datetime import datetime
 
 app = Flask(__name__)
-
 db_path = "/etc/x-ui/x-ui.db"  # Adjust path if necessary
 
 def convert_bytes(byte_size):
@@ -163,19 +157,14 @@ def home():
 def usage():
     try:
         user_input = request.form.get('user_input')  # Get input from the form
-
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-
         # Query to fetch client data
         query = '''SELECT email, up, down, total, expiry_time, inbound_id FROM client_traffics WHERE email = ? OR id = ?'''
         cursor.execute(query, (user_input, user_input))
-
         row = cursor.fetchone()
-
         if row:
             email, up, down, total, expiry_time, inbound_id = row
-
             # **Fixed expiry time handling**
             expiry_date = "Invalid Date"
             if expiry_time and isinstance(expiry_time, (int, float)):
@@ -184,15 +173,12 @@ def usage():
                     expiry_date = datetime.utcfromtimestamp(expiry_timestamp).strftime('%Y-%m-%d %H:%M:%S')
                 except (ValueError, OSError):
                     expiry_date = "Invalid Date"
-
             # Query to fetch totalGB and user-specific enable status
             inbound_query = '''SELECT settings FROM inbounds WHERE id = ?'''
             cursor.execute(inbound_query, (inbound_id,))
             inbound_row = cursor.fetchone()
-
             totalGB = "Not Available"
             user_status = "Disabled"  # Default to "Disabled" if user is not found
-
             if inbound_row:
                 settings = inbound_row[0]
                 try:
@@ -204,15 +190,12 @@ def usage():
                             break
                 except json.JSONDecodeError:
                     totalGB = "Invalid JSON Data"
-
             conn.close()
-
             # Convert to human-readable format
             up = convert_bytes(up)
             down = convert_bytes(down)
             total = convert_bytes(total)
             totalGB = convert_bytes(totalGB) if totalGB != "Not Available" else totalGB
-
             return render_template(
                 'result.html',
                 email=email,
@@ -273,7 +256,7 @@ def ping():
     return jsonify({"status": "success", "message": "Pong!"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=$PORT, debug=False$SSL_CONTEXT)
+    app.run(host='0.0.0.0', port=$PORT, debug=False)
 EOL
 
 # Set permissions for the database file
@@ -287,7 +270,7 @@ if sudo systemctl is-active --quiet traffic-x; then
     sudo systemctl stop traffic-x
 fi
 
-# Create a systemd service to keep the Flask app running
+# Create a systemd service to keep the Flask app running with Gunicorn
 echo "Setting up systemd service..."
 cat > /etc/systemd/system/traffic-x.service <<EOL
 [Unit]
@@ -297,9 +280,9 @@ After=network.target
 [Service]
 User=$USERNAME
 WorkingDirectory=/home/$USERNAME/Traffic-X
-ExecStart=/bin/bash -c 'source /home/$USERNAME/Traffic-X/venv/bin/activate && exec /home/$USERNAME/Traffic-X/venv/bin/python3 /home/$USERNAME/Traffic-X/app.py'
+ExecStart=/bin/bash -c 'source /home/$USERNAME/Traffic-X/venv/bin/activate && exec gunicorn -w 4 -b 0.0.0.0:$PORT $SSL_CONTEXT app:app'
 Environment="DB_PATH=/etc/x-ui/x-ui.db"
-Restart=on-failure
+Restart=always
 RestartSec=5
 StandardOutput=append:/var/log/traffic-x.log
 StandardError=append:/var/log/traffic-x.log
