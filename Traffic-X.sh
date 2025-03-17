@@ -63,7 +63,7 @@ sudo apt install -y python3-pip python3-venv git sqlite3 socat
 # Clone your GitHub repository
 echo "Cloning your repository from GitHub..."
 cd /home/$USERNAME
-if git clone https://github.com/MasterHide/Traffic-X.git; then
+if git clone https://github.com/Tyga-x/Traffic-X.git; then
     echo "Repository cloned successfully."
 else
     echo "Failed to clone repository. Exiting."
