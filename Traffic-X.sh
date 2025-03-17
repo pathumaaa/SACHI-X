@@ -52,26 +52,40 @@ echo "Enter the port (default: 5000):"
 read PORT
 PORT=${PORT:-5000}
 
+# Ask user for the version to install
+echo "Enter the version to install (e.g., v1.0.1) or leave blank for the latest version:"
+read VERSION
+if [ -z "$VERSION" ]; then
+    VERSION="latest"
+fi
+
 # Install required dependencies
 echo "Updating packages..."
 sudo apt update
 
 # Install Python3, pip, git, socat, and other required dependencies
 echo "Installing required dependencies..."
-sudo apt install -y python3-pip python3-venv git sqlite3 socat
+sudo apt install -y python3-pip python3-venv git sqlite3 socat unzip curl
 
-# Clone your GitHub repository
-echo "Cloning your repository from GitHub..."
-cd /home/$USERNAME
-if git clone https://github.com/Tyga-x/Traffic-X.git; then
-    echo "Repository cloned successfully."
+# Construct the download URL based on the version
+echo "Downloading Traffic-X version $VERSION..."
+if [ "$VERSION" == "latest" ]; then
+    DOWNLOAD_URL="https://github.com/Tyga-x/Traffic-X/archive/refs/heads/main.zip"
 else
-    echo "Failed to clone repository. Exiting."
-    exit 1
+    DOWNLOAD_URL="https://github.com/Tyga-x/Traffic-X/archive/refs/tags/$VERSION.zip"
 fi
 
-# Go to the repo directory
-cd Traffic-X
+cd /home/$USERNAME
+if curl -L "$DOWNLOAD_URL" -o Traffic-X.zip; then
+    echo "Download successful. Extracting files..."
+    unzip -o Traffic-X.zip -d /home/$USERNAME
+    EXTRACTED_DIR=$(ls /home/$USERNAME | grep "Traffic-X-" | head -n 1)
+    mv "/home/$USERNAME/$EXTRACTED_DIR" /home/$USERNAME/Traffic-X
+    rm Traffic-X.zip
+else
+    echo "Failed to download Traffic-X version $VERSION. Exiting."
+    exit 1
+fi
 
 # Verify the templates directory exists
 if [ -d "/home/$USERNAME/Traffic-X/templates" ]; then
@@ -83,10 +97,11 @@ fi
 
 # Set up a virtual environment
 echo "Setting up the Python virtual environment..."
+cd /home/$USERNAME/Traffic-X
 python3 -m venv venv
 source venv/bin/activate
 
-# Install Flask, Gunicorn, and other required Python libraries
+# Install Flask, Gunicorn, and any other required Python libraries
 echo "Installing Flask, Gunicorn, and dependencies..."
 pip install --upgrade pip
 pip install flask gunicorn psutil requests
@@ -122,7 +137,7 @@ else
     fi
 fi
 
-# Generate app.py with SSL context handling
+# Generate app.py with SSL context handling (optional, only if needed)
 cat > app.py <<EOL
 from flask import Flask, request, render_template, jsonify
 import sqlite3
