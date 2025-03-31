@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X-SL USAGE</title>
     <style>
+        /* Existing Gradient Background Animation */
         @keyframes gradientAnimation {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -24,6 +25,7 @@
             color: white;
             flex-direction: column;
         }
+
         .container {
             background: rgba(255, 255, 255, 0.12);
             padding: 18px;
@@ -33,6 +35,7 @@
             max-width: 400px;
             text-align: left;
         }
+
         h2 {
             color: #ffffff;
             margin-bottom: 10px;
@@ -40,6 +43,7 @@
             font-weight: bold;
             text-align: center;
         }
+
         .info {
             background: rgba(255, 255, 255, 0.15);
             margin: 8px 0;
@@ -49,6 +53,7 @@
             color: #ffffff;
             font-weight: bold;
         }
+
         .progress-container {
             width: 100%;
             background: rgba(255, 255, 255, 0.2);
@@ -56,17 +61,20 @@
             overflow: hidden;
             margin-top: 5px;
         }
+
         .progress-bar {
             height: 6px;
             width: 0%;
             background: #05B031; /* Default green color */
             transition: width 1.5s ease-in-out, background-color 0.5s ease;
         }
+
         .toggle-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
+
         .toggle {
             width: 32px;
             height: 18px;
@@ -76,6 +84,7 @@
             cursor: pointer;
             transition: 0.3s;
         }
+
         .toggle:before {
             content: "";
             position: absolute;
@@ -88,164 +97,257 @@
             transform: translateY(-50%);
             transition: 0.3s;
         }
+
         .toggle.active {
             background: #2ecc71;
         }
+
         .toggle.active:before {
             left: 16px;
         }
+
         .footer {
             font-size: 12px;
             color: #ffffff;
             margin-top: 15px;
             text-align: center;
         }
+
+        /* ============= New Animation Background ========= */
+        .background {
+            background: linear-gradient(132deg, #FC415A, #591BC5, #212335);
+            background-size: 400% 400%;
+            animation: Gradient 15s ease infinite;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 100%;
+            z-index: -1;
+        }
+
+        .cube {
+            position: absolute;
+            top: 80vh;
+            left: 45vw;
+            width: 10px;
+            height: 10px;
+            border: solid 1px #D7D4E4;
+            transform-origin: top left;
+            transform: scale(0) rotate(0deg) translate(-50%, -50%);
+            animation: cube 12s ease-in forwards infinite;
+        }
+
+        .cube:nth-child(2n) {
+            border-color: #FFF;
+        }
+
+        .cube:nth-child(2) {
+            animation-delay: 2s;
+            left: 25vw;
+            top: 40vh;
+        }
+
+        .cube:nth-child(3) {
+            animation-delay: 4s;
+            left: 75vw;
+            top: 50vh;
+        }
+
+        .cube:nth-child(4) {
+            animation-delay: 6s;
+            left: 90vw;
+            top: 10vh;
+        }
+
+        .cube:nth-child(5) {
+            animation-delay: 8s;
+            left: 10vw;
+            top: 85vh;
+        }
+
+        .cube:nth-child(6) {
+            animation-delay: 10s;
+            left: 50vw;
+            top: 10vh;
+        }
+
+        @keyframes Gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes cube {
+            from {
+                transform: scale(0) rotate(0deg) translate(-50%, -50%);
+                opacity: 1;
+            }
+            to {
+                transform: scale(20) rotate(960deg) translate(-50%, -50%);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- New Animated Background -->
+    <div class="background"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
 
-<div class="container">
-    <h2>User Data Usage</h2>
-    <div class="info">Name: {{ email }}</div>
-    <div class="info">Uploaded: {{ up }} 
-        <div class="progress-container">
-            <div class="progress-bar" id="uploaded-bar"></div>
+    <!-- Existing Content -->
+    <div class="container">
+        <h2>User Data Usage</h2>
+        <div class="info">Name: {{ email }}</div>
+        <div class="info">Uploaded: {{ up }} 
+            <div class="progress-container">
+                <div class="progress-bar" id="uploaded-bar"></div>
+            </div>
+        </div>
+        <div class="info">Downloaded: {{ down }} 
+            <div class="progress-container">
+                <div class="progress-bar" id="downloaded-bar"></div>
+            </div>
+        </div>
+        <div class="info">Limit: {{ total }} 
+            <div class="progress-container">
+                <div class="progress-bar" id="limit-bar"></div>
+            </div>
+        </div>
+        <div class="info">Expiry Date: {{ expiry_date }}</div>
+        <div class="info toggle-container">
+            <span>Config Status:</span>
+            <div class="toggle" id="config-toggle"></div>
         </div>
     </div>
-    <div class="info">Downloaded: {{ down }} 
-        <div class="progress-container">
-            <div class="progress-bar" id="downloaded-bar"></div>
-        </div>
+
+    <div class="footer">
+        &copy; 2025 Traffic-X. All rights reserved.
     </div>
-    <div class="info">Limit: {{ total }} 
-        <div class="progress-container">
-            <div class="progress-bar" id="limit-bar"></div>
-        </div>
-    </div>
-    <div class="info">Expiry Date: {{ expiry_date }}</div>
-    <div class="info toggle-container">
-        <span>Config Status:</span>
-        <div class="toggle" id="config-toggle"></div>
-    </div>
-</div>
 
-<div class="footer">
-    &copy; 2025 Traffic-X. All rights reserved.
-</div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function parseValue(value) {
+                if (!value) return 0; // Handle empty or undefined values
+                return parseFloat(value.replace(/[^\d.]/g, '')) || 0;
+            }
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        function parseValue(value) {
-            if (!value) return 0; // Handle empty or undefined values
-            return parseFloat(value.replace(/[^\d.]/g, '')) || 0;
-        }
+            function convertToMB(value, unit) {
+                if (!unit) return value; // Assume MB if no unit is provided
+                if (unit.includes("GB")) {
+                    return value * 1024; // Convert GB to MB
+                } else if (unit.includes("KB")) {
+                    return value / 1024; // Convert KB to MB
+                } else {
+                    return value; // Assume MB
+                }
+            }
 
-        function convertToMB(value, unit) {
-            if (!unit) return value; // Assume MB if no unit is provided
-            if (unit.includes("GB")) {
-                return value * 1024; // Convert GB to MB
-            } else if (unit.includes("KB")) {
-                return value / 1024; // Convert KB to MB
+            // Extract units from the Flask variables
+            let uploadedUnit = "{{ up }}".replace(/[^a-zA-Z]/g, ''); // Extract "MB", "GB", etc.
+            let downloadedUnit = "{{ down }}".replace(/[^a-zA-Z]/g, '');
+            let totalLimitUnit = "{{ total }}".replace(/[^a-zA-Z]/g, '');
+
+            // Get dynamic values from Flask backend
+            let uploaded = parseValue("{{ up }}");
+            let downloaded = parseValue("{{ down }}");
+            let totalLimit = parseValue("{{ total }}");
+
+            // Convert all values to MB
+            uploaded = convertToMB(uploaded, uploadedUnit);
+            downloaded = convertToMB(downloaded, downloadedUnit);
+            totalLimit = convertToMB(totalLimit, totalLimitUnit);
+
+            // Calculate total usage (uploaded + downloaded)
+            let totalUsage = uploaded + downloaded;
+
+            function setProgressBarColor(progressBar, percentage) {
+                if (percentage <= 50) {
+                    progressBar.style.backgroundColor = "#05B031"; // Green
+                } else if (percentage <= 80) {
+                    progressBar.style.backgroundColor = "#FFD700"; // Yellow
+                } else if (percentage <= 98) {
+                    progressBar.style.backgroundColor = "#FFA500"; // Orange
+                } else {
+                    progressBar.style.backgroundColor = "#FF0000"; // Red
+                }
+            }
+
+            function animateProgressBar(id, value, max) {
+                let progressBar = document.getElementById(id);
+                if (!progressBar) {
+                    console.error(`Element with ID ${id} not found.`);
+                    return;
+                }
+                let percentage = (value / max) * 100; // Calculate percentage
+                progressBar.style.width = percentage + "%"; // Set width
+                setProgressBarColor(progressBar, percentage); // Set color
+            }
+
+            // Animate progress bars based on usage
+            setTimeout(() => {
+                if (totalLimit > 0) {
+                    animateProgressBar("uploaded-bar", uploaded, totalLimit);
+                    animateProgressBar("downloaded-bar", downloaded, totalLimit);
+                    animateProgressBar("limit-bar", totalUsage, totalLimit);
+                }
+            }, 500);
+
+            // Get user status dynamically from backend
+            let configStatus = "{{ user_status }}".trim().toLowerCase() === "enabled";
+
+            let toggle = document.getElementById("config-toggle");
+            if (!toggle) {
+                console.error("Element with ID config-toggle not found.");
             } else {
-                return value; // Assume MB
-            }
-        }
+                // Set initial toggle state
+                if (configStatus) {
+                    toggle.classList.add("active");
+                } else {
+                    toggle.classList.remove("active");
+                }
 
-        // Extract units from the Flask variables
-        let uploadedUnit = "{{ up }}".replace(/[^a-zA-Z]/g, ''); // Extract "MB", "GB", etc.
-        let downloadedUnit = "{{ down }}".replace(/[^a-zA-Z]/g, '');
-        let totalLimitUnit = "{{ total }}".replace(/[^a-zA-Z]/g, '');
+                // Add click event listener to toggle
+                toggle.addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    let newStatus = this.classList.contains("active");
+                    console.log("New status:", newStatus);
 
-        // Get dynamic values from Flask backend
-        let uploaded = parseValue("{{ up }}");
-        let downloaded = parseValue("{{ down }}");
-        let totalLimit = parseValue("{{ total }}");
-
-        // Convert all values to MB
-        uploaded = convertToMB(uploaded, uploadedUnit);
-        downloaded = convertToMB(downloaded, downloadedUnit);
-        totalLimit = convertToMB(totalLimit, totalLimitUnit);
-
-        // Calculate total usage (uploaded + downloaded)
-        let totalUsage = uploaded + downloaded;
-
-        function setProgressBarColor(progressBar, percentage) {
-            if (percentage <= 50) {
-                progressBar.style.backgroundColor = "#05B031"; // Green
-            } else if (percentage <= 80) {
-                progressBar.style.backgroundColor = "#FFD700"; // Yellow
-            } else if (percentage <= 98) {
-                progressBar.style.backgroundColor = "#FFA500"; // Orange
-            } else {
-                progressBar.style.backgroundColor = "#FF0000"; // Red
-            }
-        }
-
-        function animateProgressBar(id, value, max) {
-            let progressBar = document.getElementById(id);
-            if (!progressBar) {
-                console.error(`Element with ID ${id} not found.`);
-                return;
-            }
-            let percentage = (value / max) * 100; // Calculate percentage
-            progressBar.style.width = percentage + "%"; // Set width
-            setProgressBarColor(progressBar, percentage); // Set color
-        }
-
-        // Animate progress bars based on usage
-        setTimeout(() => {
-            if (totalLimit > 0) {
-                animateProgressBar("uploaded-bar", uploaded, totalLimit);
-                animateProgressBar("downloaded-bar", downloaded, totalLimit);
-                animateProgressBar("limit-bar", totalUsage, totalLimit);
-            }
-        }, 500);
-
-        // Get user status dynamically from backend
-        let configStatus = "{{ user_status }}".trim().toLowerCase() === "enabled";
-
-        let toggle = document.getElementById("config-toggle");
-        if (!toggle) {
-            console.error("Element with ID config-toggle not found.");
-        } else {
-            // Set initial toggle state
-            if (configStatus) {
-                toggle.classList.add("active");
-            } else {
-                toggle.classList.remove("active");
-            }
-
-            // Add click event listener to toggle
-            toggle.addEventListener("click", function () {
-                this.classList.toggle("active");
-                let newStatus = this.classList.contains("active");
-                console.log("New status:", newStatus);
-
-                // Send new status to the server (optional)
-                fetch("/update-status", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ status: newStatus }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Status updated:", data);
-                })
-                .catch(error => {
-                    console.error("Error updating status:", error);
+                    // Send new status to the server (optional)
+                    fetch("/update-status", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ status: newStatus }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Status updated:", data);
+                    })
+                    .catch(error => {
+                        console.error("Error updating status:", error);
+                    });
                 });
-            });
-        }
+            }
 
-        // Debugging: Log values to the console
-        console.log("Uploaded: {{ up }}", uploaded);
-        console.log("Downloaded: {{ down }}", downloaded);
-        console.log("Total Limit: {{ total }}", totalLimit);
-        console.log("User Status: {{ user_status }}", configStatus);
-    });
-</script>
-
+            // Debugging: Log values to the console
+            console.log("Uploaded: {{ up }}", uploaded);
+            console.log("Downloaded: {{ down }}", downloaded);
+            console.log("Total Limit: {{ total }}", totalLimit);
+            console.log("User Status: {{ user_status }}", configStatus);
+        });
+    </script>
 </body>
 </html>
