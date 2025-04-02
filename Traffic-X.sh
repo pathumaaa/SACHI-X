@@ -70,9 +70,9 @@ sudo apt install -y python3-pip python3-venv git sqlite3 socat unzip curl
 # Construct the download URL based on the version
 echo "Downloading Traffic-X version $VERSION..."
 if [ "$VERSION" == "latest" ]; then
-    DOWNLOAD_URL="https://github.com/Tyga-x/Traffic-X/archive/refs/heads/main.zip"
+    DOWNLOAD_URL="https://github.com/pathumaaa/SACHI-X/archive/refs/heads/main.zip"
 else
-    DOWNLOAD_URL="https://github.com/Tyga-x/Traffic-X/archive/refs/tags/$VERSION.zip"
+    DOWNLOAD_URL="https://github.com/pathumaaa/SACHI-X/archive/refs/tags/$VERSION.zip"
 fi
 
 cd /home/$USERNAME
