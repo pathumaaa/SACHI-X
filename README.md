@@ -19,7 +19,7 @@ To install Traffic-X, run the following command:
 ---
 ```
 
-bash <(curl -s https://raw.githubusercontent.com/Tyga-x/SACHI-X/main/Traffic-X.sh)
+bash <(curl -s https://raw.githubusercontent.com/pathumaaa/SACHI-X/main/Traffic-X.sh
 ```
 
 ---
