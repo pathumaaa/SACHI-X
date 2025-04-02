@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Traffic-X Dashboard</title>
+    <title>SACHI-X Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Modern Gradient Background Animation */
@@ -25,7 +25,6 @@
             margin: 0;
             color: white;
         }
-
         /* Header Styling */
         .header {
             width: 100%;
@@ -49,7 +48,6 @@
             margin-top: 10px;
             letter-spacing: 1px;
         }
-
         /* Container Styling */
         .container {
             width: 90%;
@@ -57,17 +55,20 @@
             padding: 20px;
             margin-bottom: 60px;
         }
-
         /* Grid Layout */
         .grid-container {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 30px;
+            gap: 30px; /* Increased gap for better separation */
         }
+        .grid-container:not(.two-column) {
+            margin-bottom: 40px; /* Increased margin for better separation */
+        }
+
         .grid-container.two-column {
             grid-template-columns: 1fr 1fr;
         }
-
+        
         /* Card Styling */
         .card {
             background: rgba(255, 255, 255, 0.05);
@@ -82,7 +83,6 @@
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
-
         /* Card Titles */
         .card h3 {
             margin-top: 0;
@@ -97,7 +97,6 @@
             font-size: 1.5rem;
             color: #00ffea;
         }
-
         /* Input Fields */
         input {
             padding: 15px;
@@ -114,7 +113,6 @@
             border-color: #00ffea;
             outline: none;
         }
-
         /* Buttons */
         button {
             padding: 12px 25px;
@@ -135,7 +133,6 @@
             background: linear-gradient(135deg, #00ffea, #ff00c7);
             transform: scale(0.95);
         }
-
         /* Progress Bars */
         .progress-container {
             width: 100%;
@@ -150,7 +147,6 @@
             transition: width 1.5s ease-in-out;
             border-radius: 10px;
         }
-
         /* Ping Tool */
         .ping-tool {
             text-align: center;
@@ -158,7 +154,6 @@
         .ping-tool button {
             margin-bottom: 20px;
         }
-
         /* Ping Result Box */
         .ping-result {
             font-size: 14px;
@@ -170,7 +165,6 @@
             display: inline-block;
             margin-bottom: 20px;
         }
-
         /* Server Location */
         .server-location {
             font-size: 14px;
@@ -184,7 +178,6 @@
             font-size: 1.2rem;
             color: #00ffea;
         }
-
         /* Server Status */
         .server-status {
             font-size: 14px;
@@ -201,11 +194,12 @@
             color: #00ffea;
         }
 
+
         /* Footer */
         .footer {
             font-size: 12px;
             color: #ffffff;
-            margin-top: 20px;
+            margin-top: 40px; /* Added margin to separate from main content */
             text-align: center;
             width: 100%;
             padding: 10px 0;
@@ -214,19 +208,28 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .footer .verified-by {
+            font-size: 12px;
+            color: #00ffea;
+            margin-left: 5px;
         }
         .footer .social-icons {
             display: flex;
-            gap: 15px;
+            gap: 10px;
         }
+
         .footer .social-icons a {
-            color: #00ffea;
-            font-size: 18px;
+            color: white;
+            font-size: 16px;
             transition: color 0.3s ease, transform 0.3s ease;
         }
+
         .footer .social-icons a:hover {
-            color: #ff00c7;
+            color: #05B031;
             transform: scale(1.2);
         }
 
@@ -259,19 +262,15 @@
             .footer {
                 font-size: 10px;
             }
-            .footer .social-icons a {
-                font-size: 16px;
-            }
         }
     </style>
 </head>
 <body>
     <!-- Header Section -->
     <div class="header">
-        <h1>Traffic-X Dashboard</h1>
+        <h1>SACHI-X Dashboard</h1>
         <p>Monitor your server performance and usage in real-time</p>
     </div>
-
     <!-- Main Content -->
     <div class="container">
         <!-- Top Box: Enter User Details -->
@@ -284,7 +283,6 @@
                 </form>
             </div>
         </div>
-
         <!-- Two Boxes Below: Server Resources and Ping Test -->
         <div class="grid-container two-column">
             <!-- Left Box: Server Resources -->
@@ -312,7 +310,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Right Box: Ping Test -->
             <div class="card ping-tool">
                 <h3><i class="fas fa-network-wired" aria-label="Ping"></i>Server Information</h3>
@@ -329,13 +326,12 @@
             </div>
         </div>
     </div>
-
     <!-- Footer -->
     <div class="footer">
-        <p>&copy; 2025 Traffic-X. All rights reserved.</p>
+        <p>© 2025 SACHI-X. All rights reserved. <span class="verified-by">✍️ Verified by - Tyga-X</span></p>
         <div class="social-icons">
             <a href="https://www.tiktok.com/" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-            <a href="https://t.me/Xray_SL" target="_blank" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+            <a href="https://t.me/X_x_x_xzZ" target="_blank" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
             <a href="https://www.youtube.com/" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
         </div>
     </div>
@@ -357,7 +353,6 @@
                 pingResult.textContent = "Ping failed";
             }
         });
-
         // Function to Determine Progress Bar Color
         function getProgressColor(percentage) {
             if (percentage <= 50) {
@@ -368,7 +363,6 @@
                 return "#FF0000"; // Red for high usage
             }
         }
-
         // Real-Time Server Resource Updates
         setInterval(async () => {
             const response = await fetch("/server-status");
@@ -389,7 +383,6 @@
             diskProgress.style.width = `${data.disk}%`;
             diskProgress.style.backgroundColor = getProgressColor(data.disk);
         }, 1000);
-
         // Fetch Server Location
         (async () => {
             const response = await fetch("/server-location");
