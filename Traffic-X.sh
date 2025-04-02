@@ -29,7 +29,7 @@ while true; do
             ;;
         2)
             echo "Uninstalling Traffic-X..."
-            bash <(curl -s https://raw.githubusercontent.com/pathumaaa/SACHI-X/main/rm-TX.sh)
+            bash <(curl -s https://raw.githubusercontent.com/pathumaaa/Traffic-X/main/rm-TX.sh)
             echo "Traffic-X has been uninstalled."
             exit 0
             ;;
@@ -70,9 +70,9 @@ sudo apt install -y python3-pip python3-venv git sqlite3 socat unzip curl
 # Construct the download URL based on the version
 echo "Downloading Traffic-X version $VERSION..."
 if [ "$VERSION" == "latest" ]; then
-    DOWNLOAD_URL="https://github.com/pathumaaa/SACHI-X/archive/refs/heads/main.zip"
+    DOWNLOAD_URL="https://github.com/pathumaaa/Traffic-X/archive/refs/heads/main.zip"
 else
-    DOWNLOAD_URL="https://github.com/pathumaaa/SACHI-X/archive/refs/tags/$VERSION.zip"
+    DOWNLOAD_URL="https://github.com/pathumaaa/Traffic-X/archive/refs/tags/$VERSION.zip"
 fi
 
 cd /home/$USERNAME
